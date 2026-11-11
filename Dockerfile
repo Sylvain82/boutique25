@@ -31,7 +31,8 @@ COPY . .
 RUN composer dump-autoload --no-dev --classmap-authoritative \
  && mkdir -p var/cache var/log \
  && php bin/console asset-map:compile --env=prod \
- && php bin/console cache:warmup --env=prod \
+ && DATABASE_URL="postgresql://build:build@127.0.0.1:5432/build?serverVersion=16&charset=utf8" \
+    php bin/console cache:warmup --env=prod \
  && chown -R www-data:www-data var
 
 COPY docker/start.sh /usr/local/bin/start.sh

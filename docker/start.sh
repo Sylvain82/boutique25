@@ -18,7 +18,8 @@ php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migratio
 
 # Produits de démonstration, seulement si SEED_DEMO=1 ET que la table est vide
 if [ "${SEED_DEMO}" = "1" ]; then
-  php bin/console app:produits:seed --no-interaction
+  # Une erreur ici ne doit pas empêcher le site de démarrer
+  php bin/console app:produits:seed --no-interaction || echo "Avertissement : produits de démonstration non ajoutés." >&2
 fi
 
 # Les fichiers de cache générés par les commandes ci-dessus doivent rester lisibles par Apache

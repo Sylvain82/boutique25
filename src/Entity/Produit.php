@@ -9,7 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
 class Produit
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    // Séquence explicite : la génération des identifiants ne dépend plus de la base détectée
+    // au moment de la construction de l'image Docker (cache Doctrine préparé au build).
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
+    #[ORM\SequenceGenerator(sequenceName: 'produit_id_seq', allocationSize: 1)]
     #[ORM\Column]
     private ?int $id = null;
 
