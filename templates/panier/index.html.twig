@@ -3,6 +3,7 @@
 {% block title %}Boutique — Panier{% endblock %}
 
 {% block content %}
+    {% include 'commande/_etapes.html.twig' with {etape: 1} %}
     <h1 class="h3 mb-4">Mon panier</h1>
 
     {% if lignes %}
@@ -61,7 +62,7 @@
             </form>
             <div class="d-flex gap-2">
                 <a class="btn btn-outline-primary" href="{{ path('app_produits') }}">Continuer mes achats</a>
-                <button class="btn btn-primary" type="button" disabled title="Bientôt disponible">Commander (bientôt)</button>
+                <a class="btn btn-primary" href="{{ path('app_commande') }}">Commander &raquo;</a>
             </div>
         </div>
     {% else %}

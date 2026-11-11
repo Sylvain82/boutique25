@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boutique — Confirmation{% endblock %}
+
+{% block content %}
+    {% if commande.payee %}
+        {% include 'commande/_etapes.html.twig' with {etape: 5} %}
+        <div class="alert alert-success">
+            <h1 class="h4 alert-heading">Merci {{ commande.nom }}, votre commande est confirmée !</h1>
+            <p class="mb-0">
+                Commande n° <strong>{{ commande.reference }}</strong>, payée le {{ commande.payeeLe|date('d/m/Y à H:i', 'Europe/Paris') }}.
+                {% if commande.modePaiement == 'simulation' %}(paiement simulé){% endif %}
+            </p>
+        </div>
+    {% else %}
+        {% include 'commande/_etapes.html.twig' with {etape: 3} %}
+        <div class="alert alert-warning">
+            <h1 class="h4 alert-heading">Paiement en cours de vérification</h1>
+            <p>Nous n'avons pas encore reçu la confirmation du paiement de la commande n° <strong>{{ commande.reference }}</strong>.</p>
+            <a class="btn btn-sm btn-outline-dark" href="{{ path('app_commande_confirmation', {reference: commande.reference}) }}">Actualiser</a>
+            <a class="btn btn-sm btn-outline-dark" href="{{ path('app_commande_paiement', {reference: commande.reference}) }}">Revenir au paiement</a>
+        </div>
+    {% endif %}
+
+    {% include 'commande/_recapitulatif.html.twig' %}
+
+    <p class="text-body-secondary small">
+        Livraison : {{ commande.nom }}, {{ commande.adresse }}, {{ commande.codePostal }} {{ commande.ville }}
+    </p>
+
+    <a class="btn btn-primary" href="{{ path('app_produits') }}">Continuer mes achats</a>
+{% endblock %}

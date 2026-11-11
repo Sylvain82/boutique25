@@ -1,0 +1,21 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block admin %}
+    <a class="small" href="{{ path('app_admin_produits') }}">&laquo; Tous les produits</a>
+    <h1 class="h3 mt-2 mb-4">{{ produit.id ? 'Modifier « ' ~ produit.nom ~ ' »' : 'Nouveau produit' }}</h1>
+
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-6">
+            {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+                {{ form_widget(form) }}
+                <datalist id="types-existants">
+                    {% for t in types %}<option value="{{ t }}">{% endfor %}
+                </datalist>
+                <button class="btn btn-primary" type="submit">Enregistrer</button>
+                <a class="btn btn-link" href="{{ path('app_admin_produits') }}">Annuler</a>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

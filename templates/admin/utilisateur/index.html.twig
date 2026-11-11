@@ -1,0 +1,40 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% block admin %}
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h1 class="h3 mb-0">Administrateurs</h1>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="{{ path('app_admin_mot_de_passe') }}">Changer mon mot de passe</a>
+            <a class="btn btn-primary" href="{{ path('app_admin_administrateur_nouveau') }}">+ Ajouter un administrateur</a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Email</th>
+                    <th scope="col">Créé le</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for admin in administrateurs %}
+                    <tr>
+                        <td>{{ admin.email }}{% if admin == app.user %} <span class="badge text-bg-light border">vous</span>{% endif %}</td>
+                        <td>{{ admin.creeLe|date('d/m/Y', 'Europe/Paris') }}</td>
+                        <td class="text-end">
+                            {% if admin != app.user %}
+                                <form method="post" action="{{ path('app_admin_administrateur_supprimer', {id: admin.id}) }}"
+                                      onsubmit="return confirm('Retirer l\'accès de {{ admin.email|e('js') }} ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('supprimer-admin' ~ admin.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

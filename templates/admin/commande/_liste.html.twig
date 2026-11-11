@@ -1,0 +1,25 @@
+{# Tableau des commandes. Variable : commandes #}
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Référence</th>
+                <th scope="col">Client</th>
+                <th scope="col" class="text-end">Total</th>
+                <th scope="col">Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for commande in commandes %}
+                <tr>
+                    <td class="text-nowrap">{{ commande.creeLe|date('d/m/Y H:i', 'Europe/Paris') }}</td>
+                    <td><a href="{{ path('app_admin_commande', {id: commande.id}) }}">{{ commande.reference }}</a></td>
+                    <td>{{ commande.nom }}<div class="small text-body-secondary">{{ commande.email }}</div></td>
+                    <td class="text-end text-nowrap">{{ commande.total|number_format(0, ',', ' ') }}&nbsp;€</td>
+                    <td>{% include 'admin/_statut.html.twig' %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

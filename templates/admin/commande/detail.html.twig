@@ -1,0 +1,50 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% block admin %}
+    <a class="small" href="{{ path('app_admin_commandes') }}">&laquo; Toutes les commandes</a>
+    <h1 class="h3 mt-2 mb-1">Commande {{ commande.reference }}</h1>
+    <p class="mb-4">
+        {% include 'admin/_statut.html.twig' %}
+        <span class="text-body-secondary small ms-2">
+            passée le {{ commande.creeLe|date('d/m/Y à H:i', 'Europe/Paris') }}
+            {% if commande.payeeLe %}· payée le {{ commande.payeeLe|date('d/m/Y à H:i', 'Europe/Paris') }}
+                ({{ commande.modePaiement == 'simulation' ? 'paiement simulé' : 'Stripe' }}){% endif %}
+        </span>
+    </p>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            {% include 'commande/_recapitulatif.html.twig' %}
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="card mb-3">
+                <div class="card-header">Client</div>
+                <div class="card-body">
+                    {{ commande.nom }}<br>
+                    {{ commande.adresse }}<br>
+                    {{ commande.codePostal }} {{ commande.ville }}<br>
+                    <a href="mailto:{{ commande.email }}">{{ commande.email }}</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Changer le statut</div>
+                <div class="card-body">
+                    <form method="post" action="{{ path('app_admin_commande_statut', {id: commande.id}) }}" class="d-flex gap-2">
+                        <input type="hidden" name="_token" value="{{ csrf_token('statut' ~ commande.id) }}">
+                        <select class="form-select" name="statut" aria-label="Statut">
+                            {% for code, libelle in statuts %}
+                                <option value="{{ code }}"{{ code == commande.statut ? ' selected' }}>{{ libelle }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-primary" type="submit">Enregistrer</button>
+                    </form>
+                    {% if commande.paiementId and commande.modePaiement != 'simulation' %}
+                        <p class="small text-body-secondary mt-3 mb-0">Paiement Stripe : <code>{{ commande.paiementId }}</code><br>
+                        Un remboursement se fait depuis le tableau de bord Stripe.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

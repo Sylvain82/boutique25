@@ -17,3 +17,11 @@ services:
         value: "1"                   # ajoute des produits de démo si la base est vide ; mettre 0 pour désactiver
       - key: MESSENGER_TRANSPORT_DSN
         value: "doctrine://default?auto_setup=0"
+      - key: STRIPE_SECRET_KEY
+        sync: false                  # clé secrète Stripe (sk_test_… pour tester) ; vide = paiement simulé
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false                  # secret de signature du webhook Stripe (whsec_…), facultatif
+      - key: ADMIN_EMAIL
+        sync: false                  # email du premier administrateur
+      - key: ADMIN_PASSWORD
+        sync: false                  # son mot de passe (10 caractères min.) ; peut être supprimé après la 1re connexion

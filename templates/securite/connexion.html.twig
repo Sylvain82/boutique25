@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boutique — Connexion{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+            <h1 class="h3 mb-4">Connexion administrateur</h1>
+
+            {% if erreur %}
+                <div class="alert alert-danger">
+                    {{ erreur.messageKey == 'Invalid credentials.' ? 'Email ou mot de passe incorrect.' : erreur.messageKey|trans(erreur.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{{ path('app_connexion') }}">
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email</label>
+                    <input class="form-control" type="email" id="email" name="_username" value="{{ dernier_email }}" autocomplete="email" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="password">Mot de passe</label>
+                    <input class="form-control" type="password" id="password" name="_password" autocomplete="current-password" required>
+                </div>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <button class="btn btn-primary w-100" type="submit">Se connecter</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

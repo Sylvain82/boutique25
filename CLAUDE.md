@@ -14,16 +14,22 @@ Petit site de boutique perso de Sylvain (technicien méthodes, pas développeur 
 - `/` : accueil avec les 4 premières promotions.
 - `/produits` : liste avec recherche (nom ou marque), filtre par type, case « promos ». Contrôleur `ProduitController`, requêtes dans `ProduitRepository::search()` et `findTypes()`.
 - `/panier` : panier en session (pas de compte ni de table). Service `App\Service\Panier` (stocke seulement [id => quantité], relit nom/prix en base), `PanierController` (ajouter / modifier / retirer / vider, en POST avec jeton CSRF `panier`), fonction Twig `panier_nombre()` pour le badge du menu (`App\Twig\PanierExtension`). Bouton « Ajouter au panier » sur chaque carte produit. Messages flash affichés dans `base.html.twig`. Quantité max 99.
+- `/commande` : parcours d'achat (`CommandeController`) : coordonnées (`CommandeType`) → création de `Commande` + `LigneCommande` (nom et prix copiés) en statut `en_attente` → `/commande/{reference}/paiement` → `payer` (POST, CSRF) → Stripe Checkout ou paiement simulé → `/commande/{reference}/confirmation` (revérifie la session auprès de Stripe, vide le panier une fois). Un visiteur ne voit que les commandes dont la référence est dans sa session (`mes_commandes`). Webhook `/paiement/stripe/webhook` (signature HMAC vérifiée dans `Paiement::lireWebhook`).
+- Paiement : service `App\Service\Paiement`, appelle l'API Stripe avec `symfony/http-client` (pas de SDK Stripe). Variables `STRIPE_SECRET_KEY` (vide = paiement simulé) et `STRIPE_WEBHOOK_SECRET`. Montants Stripe en centimes (`prix * 100`). Tests : `tests/Service/PaiementTest.php` (`php bin/phpunit`).
+- Administration `/admin` (ROLE_ADMIN, `access_control` + `#[IsGranted]`), contrôleurs dans `src/Controller/Admin/` : tableau de bord, produits (CRUD, `ProduitType`), commandes (liste, détail, statut), administrateurs (ajout, suppression sauf soi-même, changement de mot de passe, `AdminType`). Gabarits dans `templates/admin/` (mise en page `admin/_layout.html.twig`).
+- Connexion `/connexion`, déconnexion `/deconnexion` (`SecuriteController`, `form_login` avec CSRF, 5 essais/min via `symfony/rate-limiter`). Entité `Utilisateur` (email, roles, password haché). Commande `php bin/console app:admin:creer email [--si-absent]` ; au démarrage, `start.sh` crée l'admin depuis `ADMIN_EMAIL` / `ADMIN_PASSWORD` s'il n'existe pas.
+- Statuts de commande : `en_attente`, `payee`, `expediee`, `annulee` (constantes dans `Commande`).
 - `/health` : page de santé pour Render (ne touche pas la base).
-- Entité `Produit` : id, type, nom, marque, prix (entier, en euros), promotion (bool).
+- Entités : `Produit` (id, type, nom, marque, prix entier en euros, promotion), `Utilisateur`, `Commande`, `LigneCommande` (produit mis à NULL si le produit est supprimé). Toutes avec séquence explicite.
 - Commande `php bin/console app:produits:seed` : ajoute 14 produits de démo seulement si la table est vide.
-- Il n'y a **pas** encore : administration des produits, commandes (le bouton « Commander » est désactivé), comptes clients, images de produits.
+- Il n'y a **pas** encore : comptes clients, emails de confirmation, gestion des stocks, images de produits.
 
 ## Déploiement (résumé, détails dans `DEPLOIEMENT.md`)
 
 - `Dockerfile` : PHP 8.3 + Apache. Les URL sont routées vers `index.php` par `FallbackResource` dans la config Apache (ne pas dépendre de `public/.htaccess`).
 - `docker/start.sh` : au démarrage, lance `doctrine:migrations:migrate`, puis le seed si `SEED_DEMO=1`, puis Apache. L'échec du seed n'empêche pas le démarrage.
-- Variables d'environnement Render : `APP_ENV=prod`, `APP_SECRET` (généré), `DATABASE_URL` (chaîne Neon `postgresql://…?sslmode=require`, à coller dans Render), `SEED_DEMO`, `MESSENGER_TRANSPORT_DSN`.
+- Variables d'environnement Render : `APP_ENV=prod`, `APP_SECRET` (généré), `DATABASE_URL` (chaîne Neon `postgresql://…?sslmode=require`, à coller dans Render), `SEED_DEMO`, `MESSENGER_TRANSPORT_DSN`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
+- **Ne jamais** écrire de clé Stripe ni de mot de passe dans un fichier versionné.
 - **Ne jamais** écrire la chaîne de connexion Neon dans un fichier versionné ni la coller dans une conversation. En local, elle va dans `.env.local` (ignoré par Git).
 
 ## Pièges déjà rencontrés (à ne pas refaire)
@@ -32,7 +38,8 @@ Petit site de boutique perso de Sylvain (technicien méthodes, pas développeur 
 2. **Ancienne migration MySQL** laissée dans `migrations/` : elle fait échouer le démarrage sur PostgreSQL (`AUTO_INCREMENT`). Il ne doit rester que la migration PostgreSQL.
 3. **Cache Doctrine préparé au build** : au `cache:warmup` du Dockerfile, `DATABASE_URL` n'existe pas encore ; Doctrine lisait le `.env` (alors MySQL) et choisissait une génération d'identifiants incompatible avec PostgreSQL. Corrigé : `#[ORM\GeneratedValue(strategy: 'SEQUENCE')]` + `SequenceGenerator('produit_id_seq')` dans `Produit`, et `DATABASE_URL` factice PostgreSQL au warmup dans le Dockerfile. Toute nouvelle entité doit suivre la même règle (séquence explicite).
 4. **Téléchargement Composer échoué au build** (code 100) : panne réseau passagère ; le Dockerfile réessaie jusqu'à 4 fois.
-5. **DNS** : sur les appareils de Sylvain, NextDNS peut bloquer `onrender.com` / `github.io` (« Adresse introuvable »). À vérifier avant de chercher un bug dans le site.
+5. **`composer install` en root** : les plugins Composer (dont `symfony/runtime`) sont désactivés → « Symfony Runtime is missing ». Lancer avec `COMPOSER_ALLOW_SUPERUSER=1` (le Dockerfile le fait).
+6. **DNS** : sur les appareils de Sylvain, NextDNS peut bloquer `onrender.com` / `github.io` (« Adresse introuvable »). À vérifier avant de chercher un bug dans le site.
 
 ## Limites de l'offre gratuite
 
@@ -53,9 +60,9 @@ Nouvelle table ou colonne : modifier l'entité puis `php bin/console doctrine:mi
 
 ## Prochaines étapes envisagées
 
-1. Administration des produits (ajouter / modifier / supprimer), protégée par connexion.
-2. Commande (le panier en session existe déjà).
-3. Images des produits (stockage externe, car le disque Render est éphémère).
+1. Email de confirmation de commande (symfony/mailer est installé, il faut un service d'envoi : `MAILER_DSN`).
+2. Images des produits (stockage externe, car le disque Render est éphémère).
+3. Monter de version Symfony : la 7.1 n'est plus maintenue (`composer audit` signale des failles corrigées dans les versions suivantes).
 
 ## Conventions
 

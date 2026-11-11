@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block title %}Boutique — Vos coordonnées{% endblock %}
+
+{% block content %}
+    {% include 'commande/_etapes.html.twig' with {etape: 2} %}
+    <h1 class="h3 mb-4">Vos coordonnées</h1>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-7">
+            {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+                {{ form_row(form.nom) }}
+                {{ form_row(form.email) }}
+                {{ form_row(form.adresse) }}
+                <div class="row">
+                    <div class="col-5">{{ form_row(form.codePostal) }}</div>
+                    <div class="col-7">{{ form_row(form.ville) }}</div>
+                </div>
+                <div class="d-flex gap-2 justify-content-between mt-3">
+                    <a class="btn btn-outline-secondary" href="{{ path('app_panier') }}">&laquo; Retour au panier</a>
+                    <button class="btn btn-primary" type="submit">Continuer vers le paiement &raquo;</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="card">
+                <div class="card-header">Récapitulatif</div>
+                <ul class="list-group list-group-flush">
+                    {% for ligne in lignes %}
+                        <li class="list-group-item d-flex justify-content-between gap-2">
+                            <span>{{ ligne.quantite }} × {{ ligne.produit.nom }}</span>
+                            <span class="text-nowrap">{{ ligne.sousTotal|number_format(0, ',', ' ') }}&nbsp;€</span>
+                        </li>
+                    {% endfor %}
+                    <li class="list-group-item d-flex justify-content-between fw-bold">
+                        <span>Total</span>
+                        <span class="text-nowrap">{{ total|number_format(0, ',', ' ') }}&nbsp;€</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

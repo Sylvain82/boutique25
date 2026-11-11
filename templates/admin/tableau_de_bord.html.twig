@@ -1,0 +1,58 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% block admin %}
+    <h1 class="h3 mb-4">Tableau de bord</h1>
+
+    <div class="row row-cols-2 row-cols-lg-4 g-3 mb-4">
+        <div class="col">
+            <div class="card h-100"><div class="card-body">
+                <div class="small text-body-secondary">Chiffre d'affaires</div>
+                <div class="fs-3 fw-bold">{{ chiffreAffaires|number_format(0, ',', ' ') }}&nbsp;€</div>
+            </div></div>
+        </div>
+        <div class="col">
+            <a class="card h-100 text-decoration-none" href="{{ path('app_admin_commandes', {statut: 'payee'}) }}"><div class="card-body">
+                <div class="small text-body-secondary">À expédier (payées)</div>
+                <div class="fs-3 fw-bold">{{ parStatut.payee }}</div>
+            </div></a>
+        </div>
+        <div class="col">
+            <a class="card h-100 text-decoration-none" href="{{ path('app_admin_commandes', {statut: 'en_attente'}) }}"><div class="card-body">
+                <div class="small text-body-secondary">En attente de paiement</div>
+                <div class="fs-3 fw-bold">{{ parStatut.en_attente }}</div>
+            </div></a>
+        </div>
+        <div class="col">
+            <a class="card h-100 text-decoration-none" href="{{ path('app_admin_produits') }}"><div class="card-body">
+                <div class="small text-body-secondary">Produits en ligne</div>
+                <div class="fs-3 fw-bold">{{ nbProduits }}</div>
+            </div></a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">Paiement</div>
+        <div class="card-body small">
+            {% if not stripe %}
+                <span class="badge text-bg-warning">Paiement simulé</span>
+                Aucune clé Stripe n'est configurée : les clients « paient » sans carte (démonstration).
+                Pour activer Stripe, ajoutez la variable <code>STRIPE_SECRET_KEY</code> dans Render (voir DEPLOIEMENT.md).
+            {% else %}
+                <span class="badge text-bg-{{ stripeTest ? 'info' : 'success' }}">Stripe {{ stripeTest ? 'mode test' : 'mode réel' }}</span>
+                {% if webhook %}
+                    Notifications Stripe (webhook) actives.
+                {% else %}
+                    Notifications Stripe (webhook) non configurées : une commande payée reste « en attente » si le client ferme la page avant de revenir sur le site.
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <h2 class="h5">Dernières commandes</h2>
+    {% if dernieres %}
+        {% include 'admin/commande/_liste.html.twig' with {commandes: dernieres} %}
+        <a href="{{ path('app_admin_commandes') }}">Toutes les commandes &raquo;</a>
+    {% else %}
+        <p class="text-body-secondary">Aucune commande pour le moment.</p>
+    {% endif %}
+{% endblock %}

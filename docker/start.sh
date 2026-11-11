@@ -22,6 +22,12 @@ if [ "${SEED_DEMO}" = "1" ]; then
   php bin/console app:produits:seed --no-interaction || echo "Avertissement : produits de démonstration non ajoutés." >&2
 fi
 
+# Premier administrateur : créé s'il n'existe pas encore, avec ADMIN_EMAIL et ADMIN_PASSWORD.
+# Un compte existant n'est jamais modifié. Pratique sur l'offre gratuite de Render (pas de terminal).
+if [ -n "${ADMIN_EMAIL}" ] && [ -n "${ADMIN_PASSWORD}" ]; then
+  php bin/console app:admin:creer "${ADMIN_EMAIL}" --si-absent --no-interaction || echo "Avertissement : administrateur non créé." >&2
+fi
+
 # Les fichiers de cache générés par les commandes ci-dessus doivent rester lisibles par Apache
 chown -R www-data:www-data var
 

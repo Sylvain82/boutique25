@@ -1,0 +1,18 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% block admin %}
+    <h1 class="h3 mb-3">Commandes</h1>
+
+    <ul class="nav nav-underline mb-3">
+        <li class="nav-item"><a class="nav-link{{ statut == '' ? ' active' }}" href="{{ path('app_admin_commandes') }}">Toutes</a></li>
+        {% for code, libelle in statuts %}
+            <li class="nav-item"><a class="nav-link{{ statut == code ? ' active' }}" href="{{ path('app_admin_commandes', {statut: code}) }}">{{ libelle }}</a></li>
+        {% endfor %}
+    </ul>
+
+    {% if commandes %}
+        {% include 'admin/commande/_liste.html.twig' %}
+    {% else %}
+        <div class="alert alert-light border">Aucune commande.</div>
+    {% endif %}
+{% endblock %}

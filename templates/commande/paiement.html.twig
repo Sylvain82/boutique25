@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boutique — Paiement{% endblock %}
+
+{% block content %}
+    {% include 'commande/_etapes.html.twig' with {etape: 3} %}
+    <h1 class="h3 mb-1">Paiement</h1>
+    <p class="text-body-secondary">Commande n° <strong>{{ commande.reference }}</strong></p>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-7">
+            {% include 'commande/_recapitulatif.html.twig' %}
+        </div>
+        <div class="col-12 col-lg-5">
+            <div class="card mb-3">
+                <div class="card-header">Livraison</div>
+                <div class="card-body">
+                    {{ commande.nom }}<br>
+                    {{ commande.adresse }}<br>
+                    {{ commande.codePostal }} {{ commande.ville }}<br>
+                    <span class="text-body-secondary">{{ commande.email }}</span>
+                </div>
+            </div>
+
+            {% if not stripe %}
+                <div class="alert alert-warning small">
+                    <strong>Paiement simulé.</strong> Aucune carte n'est demandée et aucun argent n'est prélevé :
+                    la boutique est en mode démonstration.
+                </div>
+            {% elseif modeTest %}
+                <div class="alert alert-info small">
+                    <strong>Mode test Stripe.</strong> Utilisez la carte <code>4242 4242 4242 4242</code>,
+                    une date future et n'importe quel code à 3 chiffres. Aucun argent n'est prélevé.
+                </div>
+            {% endif %}
+
+            <form method="post" action="{{ path('app_commande_payer', {reference: commande.reference}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('payer' ~ commande.reference) }}">
+                <button class="btn btn-success btn-lg w-100" type="submit">
+                    {{ stripe ? 'Payer par carte' : 'Simuler le paiement' }} — {{ commande.total|number_format(0, ',', ' ') }}&nbsp;€
+                </button>
+            </form>
+            {% if stripe %}
+                <p class="small text-body-secondary mt-2 mb-0">Vous allez être redirigé vers la page de paiement sécurisée de Stripe.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{# Fil d'étapes du parcours d'achat. Variable : etape (1 à 4) #}
+{% set noms = ['Panier', 'Coordonnées', 'Paiement', 'Confirmation'] %}
+<ol class="etapes list-unstyled d-flex flex-wrap gap-2 mb-4 small">
+    {% for nom in noms %}
+        <li class="badge rounded-pill {{ loop.index < etape ? 'text-bg-success' : (loop.index == etape ? 'text-bg-primary' : 'text-bg-light border text-body-secondary') }}"{{ loop.index == etape ? ' aria-current="step"' }}>
+            {{ loop.index }}. {{ nom }}
+        </li>
+    {% endfor %}
+</ol>

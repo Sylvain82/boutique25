@@ -1,0 +1,18 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block admin %}
+    <a class="small" href="{{ path('app_admin_administrateurs') }}">&laquo; Administrateurs</a>
+    <h1 class="h3 mt-2 mb-4">{{ titre }}</h1>
+
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-5">
+            {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+                {{ form_widget(form) }}
+                <button class="btn btn-primary" type="submit">Enregistrer</button>
+                <a class="btn btn-link" href="{{ path('app_admin_administrateurs') }}">Annuler</a>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

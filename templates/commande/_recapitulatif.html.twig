@@ -1,0 +1,29 @@
+{# Détail d'une commande enregistrée. Variable : commande #}
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th scope="col">Produit</th>
+                <th scope="col" class="text-end">Prix</th>
+                <th scope="col" class="text-center">Qté</th>
+                <th scope="col" class="text-end">Sous-total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in commande.lignes %}
+                <tr>
+                    <td>{{ ligne.nomProduit }}</td>
+                    <td class="text-end text-nowrap">{{ ligne.prixUnitaire|number_format(0, ',', ' ') }}&nbsp;€</td>
+                    <td class="text-center">{{ ligne.quantite }}</td>
+                    <td class="text-end text-nowrap">{{ ligne.sousTotal|number_format(0, ',', ' ') }}&nbsp;€</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th scope="row" colspan="3" class="text-end">Total</th>
+                <td class="text-end text-nowrap fs-5 fw-bold">{{ commande.total|number_format(0, ',', ' ') }}&nbsp;€</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

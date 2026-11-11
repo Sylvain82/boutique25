@@ -1,0 +1,3 @@
+{# Badge coloré du statut d'une commande. Variable : commande #}
+{% set couleurs = {en_attente: 'warning', payee: 'success', expediee: 'primary', annulee: 'secondary'} %}
+<span class="badge text-bg-{{ couleurs[commande.statut] ?? 'light' }}">{{ commande.statutLibelle }}</span>
