@@ -20,6 +20,11 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
  && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
  && sed -ri -e 's!AllowOverride None!AllowOverride All!g' /etc/apache2/apache2.conf
 
+# Toutes les URL (/produits, etc.) sont envoyées au contrôleur frontal Symfony.
+# Réglé ici, dans la configuration Apache, pour ne pas dépendre du fichier caché public/.htaccess.
+RUN printf '<Directory /var/www/html/public>\n    DirectoryIndex index.php\n    FallbackResource /index.php\n</Directory>\n' > /etc/apache2/conf-available/symfony.conf \
+ && a2enconf symfony
+
 WORKDIR /var/www/html
 
 # 1) Dépendances (couche mise en cache tant que composer.json/lock ne changent pas)
