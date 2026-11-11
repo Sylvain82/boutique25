@@ -1,9 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% block title%}
-    <title>Home</title>
-{% endblock %}
+{% block title %}Boutique — Accueil{% endblock %}
 
 {% block content %}
-    <h1>TEST</h1>
+    <div class="bg-body-tertiary p-5 rounded mb-5">
+        <h1>Bienvenue dans la boutique</h1>
+        <p class="lead">Retrouvez notre sélection de produits et profitez des promotions du moment.</p>
+        <a class="btn btn-lg btn-primary" href="{{ path('app_produits') }}" role="button">Voir tous les produits &raquo;</a>
+    </div>
+
+    <h2 class="h4 mb-3">Promotions</h2>
+    {% if promotions %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+            {% for produit in promotions %}
+                {% include '_partials/produit_card.html.twig' %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-body-secondary">Aucune promotion pour le moment.</p>
+    {% endif %}
 {% endblock %}

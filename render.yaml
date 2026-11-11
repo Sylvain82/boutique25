@@ -1,0 +1,19 @@
+# Déploiement sur Render (https://render.com) : « New + > Blueprint » puis choisir ce dépôt.
+# Les secrets ne sont JAMAIS dans ce fichier : DATABASE_URL est demandée par Render à la création.
+services:
+  - type: web
+    name: boutique
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: prod
+      - key: APP_SECRET
+        generateValue: true          # Render génère un secret aléatoire
+      - key: DATABASE_URL
+        sync: false                  # URL PostgreSQL (Neon, Supabase ou base Render) à coller dans Render
+      - key: SEED_DEMO
+        value: "1"                   # ajoute des produits de démo si la base est vide ; mettre 0 pour désactiver
+      - key: MESSENGER_TRANSPORT_DSN
+        value: "doctrine://default?auto_setup=0"

@@ -9,6 +9,13 @@ framework:
     #esi: true
     #fragments: true
 
+when@prod:
+    framework:
+        # Render place le site derrière un proxy HTTPS : on fait confiance à ses en-têtes X-Forwarded-*
+        # pour que Symfony génère des URL en https et détecte la bonne adresse IP.
+        trusted_proxies: '127.0.0.1,REMOTE_ADDR'
+        trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
+
 when@test:
     framework:
         test: true

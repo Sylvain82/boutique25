@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boutique — Produits{% endblock %}
+
+{% block content %}
+    <h1 class="h3 mb-4">Produits</h1>
+
+    <form class="row g-2 mb-4" method="get" action="{{ path('app_produits') }}">
+        <div class="col-12 col-md-5">
+            <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Nom ou marque" aria-label="Nom ou marque">
+        </div>
+        <div class="col-6 col-md-3">
+            <select class="form-select" name="type" aria-label="Type de produit">
+                <option value="">Tous les types</option>
+                {% for t in types %}
+                    <option value="{{ t }}"{{ t == type ? ' selected' }}>{{ t }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-6 col-md-2 d-flex align-items-center">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="promo" value="1" id="promo"{{ promo ? ' checked' }}>
+                <label class="form-check-label" for="promo">Promos</label>
+            </div>
+        </div>
+        <div class="col-12 col-md-2 d-grid">
+            <button class="btn btn-primary" type="submit">Filtrer</button>
+        </div>
+    </form>
+
+    {% if produits %}
+        <p class="text-body-secondary">{{ produits|length }} produit{{ produits|length > 1 ? 's' }}</p>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+            {% for produit in produits %}
+                {% include '_partials/produit_card.html.twig' %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-light border">Aucun produit ne correspond à votre recherche.</div>
+    {% endif %}
+{% endblock %}
