@@ -2,3 +2,4 @@
 body { min-height: 100vh; display: flex; flex-direction: column; }
 main { flex: 1 0 auto; }
 .card-title { font-size: 1.05rem; }
+.panier-quantite input { width: 4.5rem; }

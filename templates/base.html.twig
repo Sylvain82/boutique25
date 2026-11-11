@@ -27,6 +27,11 @@
                     <a class="nav-link{{ route == 'app_produits' ? ' active' }}" href="{{ path('app_produits') }}">Produits</a>
                 </li>
             </ul>
+            {% set nbPanier = panier_nombre() %}
+            <a class="btn btn-outline-light me-md-3 mb-2 mb-md-0{{ route starts with 'app_panier' ? ' active' }}" href="{{ path('app_panier') }}">
+                Panier
+                {% if nbPanier > 0 %}<span class="badge text-bg-warning ms-1">{{ nbPanier }}</span>{% endif %}
+            </a>
             <form class="d-flex" role="search" action="{{ path('app_produits') }}" method="get">
                 <input class="form-control me-2" type="search" name="q" placeholder="Rechercher un produit" aria-label="Rechercher">
                 <button class="btn btn-outline-success" type="submit">Rechercher</button>
@@ -36,6 +41,14 @@
 </nav>
 
 <main class="container">
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
     {% block content %}{% endblock %}
 </main>
 

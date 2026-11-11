@@ -13,10 +13,11 @@ Petit site de boutique perso de Sylvain (technicien méthodes, pas développeur 
 
 - `/` : accueil avec les 4 premières promotions.
 - `/produits` : liste avec recherche (nom ou marque), filtre par type, case « promos ». Contrôleur `ProduitController`, requêtes dans `ProduitRepository::search()` et `findTypes()`.
+- `/panier` : panier en session (pas de compte ni de table). Service `App\Service\Panier` (stocke seulement [id => quantité], relit nom/prix en base), `PanierController` (ajouter / modifier / retirer / vider, en POST avec jeton CSRF `panier`), fonction Twig `panier_nombre()` pour le badge du menu (`App\Twig\PanierExtension`). Bouton « Ajouter au panier » sur chaque carte produit. Messages flash affichés dans `base.html.twig`. Quantité max 99.
 - `/health` : page de santé pour Render (ne touche pas la base).
 - Entité `Produit` : id, type, nom, marque, prix (entier, en euros), promotion (bool).
 - Commande `php bin/console app:produits:seed` : ajoute 14 produits de démo seulement si la table est vide.
-- Il n'y a **pas** encore : administration des produits, panier, commandes, comptes clients, images de produits.
+- Il n'y a **pas** encore : administration des produits, commandes (le bouton « Commander » est désactivé), comptes clients, images de produits.
 
 ## Déploiement (résumé, détails dans `DEPLOIEMENT.md`)
 
@@ -53,7 +54,7 @@ Nouvelle table ou colonne : modifier l'entité puis `php bin/console doctrine:mi
 ## Prochaines étapes envisagées
 
 1. Administration des produits (ajouter / modifier / supprimer), protégée par connexion.
-2. Panier (en session) puis commande.
+2. Commande (le panier en session existe déjà).
 3. Images des produits (stockage externe, car le disque Render est éphémère).
 
 ## Conventions

@@ -9,7 +9,13 @@
             </div>
             <h5 class="card-title">{{ produit.nom }}</h5>
             <p class="card-text text-body-secondary mb-3">{{ produit.marque }}</p>
-            <p class="fs-4 fw-semibold mt-auto mb-0">{{ produit.prix|number_format(0, ',', ' ') }}&nbsp;€</p>
+            <div class="d-flex justify-content-between align-items-center mt-auto">
+                <p class="fs-4 fw-semibold mb-0">{{ produit.prix|number_format(0, ',', ' ') }}&nbsp;€</p>
+                <form method="post" action="{{ path('app_panier_ajouter', {id: produit.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('panier') }}">
+                    <button class="btn btn-sm btn-primary" type="submit">Ajouter au panier</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

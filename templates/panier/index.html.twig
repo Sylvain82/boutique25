@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boutique — Panier{% endblock %}
+
+{% block content %}
+    <h1 class="h3 mb-4">Mon panier</h1>
+
+    {% if lignes %}
+        {% set jeton = csrf_token('panier') %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">Produit</th>
+                        <th scope="col" class="text-end">Prix</th>
+                        <th scope="col" class="text-center">Quantité</th>
+                        <th scope="col" class="text-end">Sous-total</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ligne in lignes %}
+                        {% set produit = ligne.produit %}
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">{{ produit.nom }}</div>
+                                <div class="small text-body-secondary">{{ produit.marque }} · {{ produit.type }}</div>
+                            </td>
+                            <td class="text-end text-nowrap">{{ produit.prix|number_format(0, ',', ' ') }}&nbsp;€</td>
+                            <td class="text-center">
+                                <form class="d-inline-flex gap-1 panier-quantite" method="post" action="{{ path('app_panier_modifier', {id: produit.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ jeton }}">
+                                    <input class="form-control form-control-sm" type="number" name="quantite" value="{{ ligne.quantite }}" min="0" max="{{ quantiteMax }}" aria-label="Quantité de {{ produit.nom }}">
+                                    <button class="btn btn-sm btn-outline-secondary" type="submit">OK</button>
+                                </form>
+                            </td>
+                            <td class="text-end text-nowrap fw-semibold">{{ ligne.sousTotal|number_format(0, ',', ' ') }}&nbsp;€</td>
+                            <td class="text-end">
+                                <form method="post" action="{{ path('app_panier_retirer', {id: produit.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ jeton }}">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Retirer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th scope="row" colspan="3" class="text-end">Total</th>
+                        <td class="text-end text-nowrap fs-5 fw-bold">{{ total|number_format(0, ',', ' ') }}&nbsp;€</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 justify-content-between">
+            <form method="post" action="{{ path('app_panier_vider') }}" onsubmit="return confirm('Vider le panier ?');">
+                <input type="hidden" name="_token" value="{{ jeton }}">
+                <button class="btn btn-outline-secondary" type="submit">Vider le panier</button>
+            </form>
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-primary" href="{{ path('app_produits') }}">Continuer mes achats</a>
+                <button class="btn btn-primary" type="button" disabled title="Bientôt disponible">Commander (bientôt)</button>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-light border">
+            Votre panier est vide.
+            <a href="{{ path('app_produits') }}">Voir les produits</a>
+        </div>
+    {% endif %}
+{% endblock %}
