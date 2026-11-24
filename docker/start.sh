@@ -20,6 +20,8 @@ php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migratio
 if [ "${SEED_DEMO}" = "1" ]; then
   # Une erreur ici ne doit pas empêcher le site de démarrer
   php bin/console app:produits:seed --no-interaction || echo "Avertissement : produits de démonstration non ajoutés." >&2
+  # Illustrations des produits de démo qui n'ont pas encore de photo (une photo envoyée n'est jamais remplacée)
+  php bin/console app:produits:photos --no-interaction || echo "Avertissement : illustrations non ajoutées." >&2
 fi
 
 # Premier administrateur : créé s'il n'existe pas encore, avec ADMIN_EMAIL et ADMIN_PASSWORD.

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+<defs>
+  <linearGradient id="fond" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#eaf0f4"/><stop offset="1" stop-color="#c8d4dc"/></linearGradient>
+  <radialGradient id="ombre"><stop offset="0" stop-color="#000" stop-opacity=".28"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="noir" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3f46"/><stop offset="1" stop-color="#16181c"/></linearGradient>
+  <linearGradient id="noirH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#16181c"/><stop offset=".5" stop-color="#3b3f46"/><stop offset="1" stop-color="#16181c"/></linearGradient>
+  <linearGradient id="blanc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9dde3"/></linearGradient>
+  <linearGradient id="alu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef0f3"/><stop offset=".5" stop-color="#b8bec7"/><stop offset="1" stop-color="#8d949e"/></linearGradient>
+  <linearGradient id="ecran" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f7cff"/><stop offset=".55" stop-color="#7b5cff"/><stop offset="1" stop-color="#ff6fb1"/></linearGradient>
+  <pattern id="tissu" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#2a2e35"/><circle cx="4" cy="4" r="1.4" fill="#1a1c21"/></pattern>
+</defs>
+<rect width="800" height="600" fill="url(#fond)"/>
+<ellipse cx="400" cy="410" rx="240" ry="18" fill="url(#ombre)"/>
+
+<path d="M240 330 C170 330 150 260 110 240" fill="none" stroke="#2a2e35" stroke-width="14" stroke-linecap="round"/>
+<rect x="88" y="222" width="38" height="24" rx="8" fill="url(#alu)" transform="rotate(25 107 234)"/>
+<rect x="240" y="270" width="380" height="120" rx="26" fill="url(#alu)"/>
+<rect x="240" y="270" width="380" height="40" rx="20" fill="#fff" fill-opacity=".25"/>
+<g fill="#1c1f24">
+  <rect x="280" y="318" width="40" height="16" rx="3"/><rect x="335" y="318" width="40" height="16" rx="3"/><rect x="390" y="318" width="40" height="16" rx="3"/>
+  <rect x="448" y="320" width="28" height="12" rx="6"/><rect x="490" y="320" width="28" height="12" rx="6"/>
+  <rect x="535" y="314" width="30" height="22" rx="3"/><rect x="578" y="318" width="20" height="14" rx="3"/>
+</g>
+<circle cx="600" cy="292" r="4" fill="#3ccf91"/>
+</svg>

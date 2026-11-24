@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+<defs>
+  <linearGradient id="fond" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#f1efe9"/><stop offset="1" stop-color="#d8d2c4"/></linearGradient>
+  <radialGradient id="ombre"><stop offset="0" stop-color="#000" stop-opacity=".28"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="noir" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3f46"/><stop offset="1" stop-color="#16181c"/></linearGradient>
+  <linearGradient id="noirH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#16181c"/><stop offset=".5" stop-color="#3b3f46"/><stop offset="1" stop-color="#16181c"/></linearGradient>
+  <linearGradient id="blanc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9dde3"/></linearGradient>
+  <linearGradient id="alu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef0f3"/><stop offset=".5" stop-color="#b8bec7"/><stop offset="1" stop-color="#8d949e"/></linearGradient>
+  <linearGradient id="ecran" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f7cff"/><stop offset=".55" stop-color="#7b5cff"/><stop offset="1" stop-color="#ff6fb1"/></linearGradient>
+  <pattern id="tissu" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#2a2e35"/><circle cx="4" cy="4" r="1.4" fill="#1a1c21"/></pattern>
+</defs>
+<rect width="800" height="600" fill="url(#fond)"/>
+<ellipse cx="400" cy="486" rx="230" ry="18" fill="url(#ombre)"/>
+
+<path d="M250 470 L330 300" stroke="url(#alu)" stroke-width="18" stroke-linecap="round"/>
+<path d="M550 470 L470 300" stroke="url(#alu)" stroke-width="18" stroke-linecap="round"/>
+<path d="M230 470 H330" stroke="url(#alu)" stroke-width="12" stroke-linecap="round"/>
+<path d="M470 470 H570" stroke="url(#alu)" stroke-width="12" stroke-linecap="round"/>
+<path d="M200 300 L600 300 L640 340 L240 340 Z" fill="url(#alu)"/>
+<path d="M240 340 L640 340 L640 352 L240 352 Z" fill="#7f8690"/>
+<path d="M235 298 L250 140 L590 140 L600 298 Z" fill="#1b1d22"/>
+<path d="M250 290 L262 152 L578 152 L588 290 Z" fill="url(#ecran)"/>
+<path d="M262 152 L420 152 L330 290 L250 290 Z" fill="#fff" fill-opacity=".10"/>
+</svg>
