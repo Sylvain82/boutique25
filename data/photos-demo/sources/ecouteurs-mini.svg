@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+<defs>
+  <linearGradient id="fond" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#e6f4f1"/><stop offset="1" stop-color="#bfe0d9"/></linearGradient>
+  <radialGradient id="ombre"><stop offset="0" stop-color="#000" stop-opacity=".28"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="noir" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3f46"/><stop offset="1" stop-color="#16181c"/></linearGradient>
+  <linearGradient id="noirH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#16181c"/><stop offset=".5" stop-color="#3b3f46"/><stop offset="1" stop-color="#16181c"/></linearGradient>
+  <linearGradient id="blanc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9dde3"/></linearGradient>
+  <linearGradient id="alu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef0f3"/><stop offset=".5" stop-color="#b8bec7"/><stop offset="1" stop-color="#8d949e"/></linearGradient>
+  <linearGradient id="ecran" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f7cff"/><stop offset=".55" stop-color="#7b5cff"/><stop offset="1" stop-color="#ff6fb1"/></linearGradient>
+  <pattern id="tissu" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#2a2e35"/><circle cx="4" cy="4" r="1.4" fill="#1a1c21"/></pattern>
+</defs>
+<rect width="800" height="600" fill="url(#fond)"/>
+<ellipse cx="430" cy="470" rx="250" ry="22" fill="url(#ombre)"/>
+
+<rect x="230" y="290" width="230" height="160" rx="64" fill="url(#noir)"/>
+<path d="M232 352 H458" stroke="#0e0f12" stroke-width="3"/>
+<path d="M260 312 C300 300 380 300 430 312" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="8" stroke-linecap="round"/>
+<circle cx="345" cy="400" r="6" fill="#3ccf91"/>
+<g transform="translate(530 280)">
+  <circle cx="0" cy="0" r="52" fill="url(#noir)"/>
+  <circle cx="0" cy="0" r="30" fill="#2b2e34"/>
+  <circle cx="0" cy="0" r="12" fill="#3ccf91"/>
+  <ellipse cx="-38" cy="18" rx="20" ry="16" fill="#5d6570"/>
+</g>
+<g transform="translate(610 360)">
+  <circle cx="0" cy="0" r="52" fill="url(#noir)"/>
+  <circle cx="0" cy="0" r="30" fill="#2b2e34"/>
+  <circle cx="0" cy="0" r="12" fill="#3ccf91"/>
+  <ellipse cx="-38" cy="18" rx="20" ry="16" fill="#5d6570"/>
+</g>
+</svg>

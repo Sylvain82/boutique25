@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+<defs>
+  <linearGradient id="fond" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#e5f1fb"/><stop offset="1" stop-color="#bcd8f0"/></linearGradient>
+  <radialGradient id="ombre"><stop offset="0" stop-color="#000" stop-opacity=".28"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="noir" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3f46"/><stop offset="1" stop-color="#16181c"/></linearGradient>
+  <linearGradient id="noirH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#16181c"/><stop offset=".5" stop-color="#3b3f46"/><stop offset="1" stop-color="#16181c"/></linearGradient>
+  <linearGradient id="blanc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9dde3"/></linearGradient>
+  <linearGradient id="alu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef0f3"/><stop offset=".5" stop-color="#b8bec7"/><stop offset="1" stop-color="#8d949e"/></linearGradient>
+  <linearGradient id="ecran" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f7cff"/><stop offset=".55" stop-color="#7b5cff"/><stop offset="1" stop-color="#ff6fb1"/></linearGradient>
+  <pattern id="tissu" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#2a2e35"/><circle cx="4" cy="4" r="1.4" fill="#1a1c21"/></pattern>
+</defs>
+<rect width="800" height="600" fill="url(#fond)"/>
+<ellipse cx="408" cy="488" rx="160" ry="18" fill="url(#ombre)"/>
+
+<path d="M280 470 C276 390 300 300 360 245 C405 205 455 190 490 205 C530 225 540 320 535 470 Z" fill="url(#noir)"/>
+<path d="M490 205 C530 225 540 320 535 470 L498 470 C503 340 492 262 465 212 Z" fill="#4a505a"/>
+<path d="M472 300 C500 300 520 304 538 312" fill="none" stroke="#16181c" stroke-width="4"/>
+<rect x="476" y="232" width="14" height="40" rx="7" fill="#9aa3ae" transform="rotate(-28 483 252)"/>
+<rect x="352" y="318" width="44" height="14" rx="7" fill="#5d6570" transform="rotate(-38 374 325)"/>
+<rect x="336" y="345" width="44" height="14" rx="7" fill="#5d6570" transform="rotate(-38 358 352)"/>
+<path d="M300 440 C330 420 380 415 430 425" fill="none" stroke="#2f80ed" stroke-width="7" stroke-linecap="round"/>
+<path d="M320 300 C340 265 370 240 405 222" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="10" stroke-linecap="round"/>
+<path d="M280 470 L535 470 L540 480 L276 480 Z" fill="#0e0f12"/>
+</svg>

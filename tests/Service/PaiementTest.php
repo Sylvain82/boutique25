@@ -48,13 +48,39 @@ class PaiementTest extends TestCase
         self::assertSame('POST', $requete['methode']);
         self::assertSame('https://api.stripe.com/v1/checkout/sessions', $requete['url']);
         self::assertContains('Authorization: Bearer sk_test_abc', $requete['options']['headers']);
+        self::assertContains('Stripe-Version: ' . Paiement::VERSION_API, $requete['options']['headers']);
+        self::assertContains('Idempotency-Key: checkout-' . $commande->getReference() . '-initiale', $requete['options']['headers']);
 
         parse_str($requete['options']['body'], $corps);
         self::assertSame('payment', $corps['mode']);
+        self::assertArrayNotHasKey('payment_method_types', $corps, 'moyens de paiement gérés dans le tableau de bord Stripe');
+        self::assertSame(Paiement::IDENTIFIANT_INTEGRATION, $corps['integration_identifier']);
+        self::assertEqualsWithDelta(time() + Paiement::DUREE_SESSION, (int) $corps['expires_at'], 5);
         self::assertSame($commande->getReference(), $corps['client_reference_id']);
         self::assertSame('8900', $corps['line_items'][0]['price_data']['unit_amount']); // centimes
         self::assertSame('2', $corps['line_items'][0]['quantity']);
         self::assertSame('https://boutique.test/ok?session_id={CHECKOUT_SESSION_ID}', $corps['success_url']);
+    }
+
+    public function testNouvelleCleDIdempotenceQuandLaPageAExpire(): void
+    {
+        $entetes = null;
+        $client = new MockHttpClient(function (string $methode, string $url, array $options) use (&$entetes) {
+            $entetes = $options['headers'];
+
+            return new MockResponse(json_encode(['id' => 'cs_test_2', 'url' => 'https://checkout.stripe.com/c/pay/cs_test_2']));
+        });
+        $commande = $this->commande();
+        (new Paiement($client, 'rk_test_abc'))->creerSessionStripe($commande, 'https://a/ok', 'https://a/ko', 'cs_test_1');
+
+        self::assertContains('Idempotency-Key: checkout-' . $commande->getReference() . '-cs_test_1', $entetes);
+    }
+
+    public function testCleRestreinteDeTest(): void
+    {
+        self::assertTrue((new Paiement(new MockHttpClient(), 'rk_test_abc'))->isModeTest());
+        self::assertFalse((new Paiement(new MockHttpClient(), 'rk_live_abc'))->isModeTest());
+        self::assertFalse((new Paiement(new MockHttpClient(), 'sk_live_abc'))->isModeTest());
     }
 
     public function testErreurStripeRemonteeProprement(): void
@@ -74,6 +100,13 @@ class PaiementTest extends TestCase
         self::assertTrue((new Paiement(new MockHttpClient($reponse('paid', 17800)), 'sk_test_x'))->sessionEstPayee('cs_1', $commande));
         self::assertFalse((new Paiement(new MockHttpClient($reponse('unpaid', 17800)), 'sk_test_x'))->sessionEstPayee('cs_1', $commande));
         self::assertFalse((new Paiement(new MockHttpClient($reponse('paid', 100)), 'sk_test_x'))->sessionEstPayee('cs_1', $commande), 'montant différent');
+
+        // Session reçue par webhook : même vérification, sans appel à Stripe
+        $paiement = new Paiement(new MockHttpClient(), 'sk_test_x');
+        $session = ['payment_status' => 'paid', 'client_reference_id' => $commande->getReference(), 'amount_total' => 17800];
+        self::assertTrue($paiement->sessionPayeePour($session, $commande));
+        self::assertFalse($paiement->sessionPayeePour(['payment_status' => 'unpaid'] + $session, $commande), 'paiement différé pas encore reçu');
+        self::assertFalse($paiement->sessionPayeePour(['client_reference_id' => 'AUTRE'] + $session, $commande), 'autre commande');
     }
 
     public function testSignatureDuWebhook(): void
