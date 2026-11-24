@@ -12,6 +12,12 @@
                 {% if commande.modePaiement == 'simulation' %}(paiement simulé){% endif %}
             </p>
         </div>
+    {% elseif commande.statut == 'annulee' %}
+        <div class="alert alert-secondary">
+            <h1 class="h4 alert-heading">Commande annulée</h1>
+            <p>La commande n° <strong>{{ commande.reference }}</strong> n'a pas été payée à temps, ou le paiement a été refusé. Aucun montant n'a été prélevé.</p>
+            <a class="btn btn-sm btn-outline-dark" href="{{ path('app_panier') }}">Recommencer depuis mon panier</a>
+        </div>
     {% else %}
         {% include 'commande/_etapes.html.twig' with {etape: 3} %}
         <div class="alert alert-warning">

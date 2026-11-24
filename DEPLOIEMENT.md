@@ -58,21 +58,33 @@ Parcours client : Panier > Commander > coordonnées > paiement > confirmation.
 
 **Sans configuration**, le paiement est **simulé** : un bouton « Simuler le paiement » valide la commande sans carte. C'est pratique pour une démonstration.
 
-**Pour activer Stripe** (paiement par carte sur une page sécurisée de Stripe, la carte ne passe jamais par ton serveur) :
+**Pour activer Stripe** (la carte est saisie sur une page sécurisée de Stripe et ne passe jamais par ton serveur) :
 
 1. Crée un compte sur stripe.com. Il n'y a pas d'abonnement : Stripe prend une commission sur chaque paiement réel. Vérifie leurs tarifs actuels.
-2. Reste en **mode test** (interrupteur « Test mode » dans le tableau de bord Stripe). Dans Développeurs > Clés API, copie la **clé secrète** `sk_test_…`.
-3. Dans Render, ajoute la variable `STRIPE_SECRET_KEY` = cette clé. **Ne la mets jamais dans un fichier du projet ni dans une conversation.**
-4. Teste un achat avec la carte `4242 4242 4242 4242`, une date d'expiration future et n'importe quel code à 3 chiffres.
+2. Travaille dans un **sandbox**, un environnement de test isolé que Stripe conseille plutôt que l'ancien « mode test » partagé : sélecteur de compte en haut à gauche > Sandboxes > Créer. Aucun argent réel n'y circule.
+3. Crée une **clé restreinte** plutôt que la clé secrète : Développeurs > Clés API > **Créer une clé restreinte**. Donne-lui un nom (« boutique25 ») et une seule permission : **Checkout Sessions : écriture** (Write). Laisse tout le reste sur « Aucun ». Si la clé est volée, elle ne permet presque rien. La clé commence par `rk_test_…`.
+4. Dans Render, ajoute la variable `STRIPE_SECRET_KEY` = cette clé. **Ne la mets jamais dans un fichier du projet ni dans une conversation.**
+5. Teste un achat avec la carte `4242 4242 4242 4242`, une date d'expiration future et n'importe quel code à 3 chiffres.
 
-**Recommandé : la notification de paiement (webhook).** Sans elle, si un client paie puis ferme la page avant de revenir sur le site, la commande reste « en attente ».
+**Obligatoire avant la mise en ligne : la notification de paiement (webhook).** C'est elle qui fait foi : sans elle, si un client paie puis ferme la page avant de revenir sur le site, sa commande reste « en attente » et il ne reçoit pas d'email. Elle est aussi indispensable pour les moyens de paiement différés (virement, prélèvement), confirmés plusieurs heures ou jours après.
 
-1. Dans Stripe > Développeurs > Webhooks > **Ajouter un endpoint**, l'adresse est `https://ton-site.onrender.com/paiement/stripe/webhook`. L'événement à écouter est `checkout.session.completed`.
-2. Copie le « secret de signature » `whsec_…`, puis ajoute-le dans Render comme `STRIPE_WEBHOOK_SECRET`.
+1. Dans Stripe > Développeurs > Webhooks > **Ajouter une destination**, choisis l'adresse `https://boutique25.onrender.com/paiement/stripe/webhook`.
+2. Coche ces 4 événements :
+   - `checkout.session.completed` : paiement terminé ;
+   - `checkout.session.async_payment_succeeded` : paiement différé encaissé ;
+   - `checkout.session.async_payment_failed` : paiement différé refusé, la commande passe en « annulée » ;
+   - `checkout.session.expired` : page de paiement abandonnée (au bout d'1 heure), la commande passe en « annulée ».
+3. Copie le « secret de signature » `whsec_…`, puis ajoute-le dans Render comme `STRIPE_WEBHOOK_SECRET`. Le site rejette toute notification dont la signature n'est pas valide.
 
 Le tableau de bord de l'administration indique si Stripe et le webhook sont actifs.
 
-**Passer en paiements réels** : il faut activer le compte Stripe (identité, IBAN…) et remplacer la clé par la clé `sk_live_…` (et le webhook par celui du mode réel). Pour un vrai commerce, il faut aussi des mentions légales et des CGV.
+**Ce que fait le site** :
+- Version de l'API Stripe fixée (`2026-11-18.endive`) : un changement de version sur ton compte ne modifie pas son fonctionnement.
+- Un double clic sur « Payer » réutilise la même page de paiement : jamais deux paiements pour une commande.
+- Les moyens de paiement proposés (carte, Apple Pay, etc.) se règlent dans le tableau de bord Stripe (Paramètres > Moyens de paiement), sans toucher au code.
+- Les paiements du site sont étiquetés `boutique25-checkout-…` dans le tableau de bord Stripe.
+
+**Passer en paiements réels** : active le compte Stripe (identité, IBAN…), crée en mode réel une clé restreinte `rk_live_…` avec la même permission et un webhook avec les mêmes 4 événements, puis remplace les deux variables dans Render. Pour un vrai commerce, il faut aussi des mentions légales et des CGV. Consulte la liste de vérification « Go live » de Stripe.
 
 ## Emails de confirmation de commande
 
