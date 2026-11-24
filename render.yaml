@@ -21,6 +21,8 @@ services:
         sync: false                  # clé secrète Stripe (sk_test_… pour tester) ; vide = paiement simulé
       - key: STRIPE_WEBHOOK_SECRET
         sync: false                  # secret de signature du webhook Stripe (whsec_…), facultatif
+      # Emails (MAILER_DSN, MAILER_FROM, MAILER_COPIE) : à ajouter à la main dans Render
+      # une fois le compte Brevo prêt (voir DEPLOIEMENT.md). Sans eux, les emails sont désactivés.
       - key: ADMIN_EMAIL
         sync: false                  # email du premier administrateur
       - key: ADMIN_PASSWORD

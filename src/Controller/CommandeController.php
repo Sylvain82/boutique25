@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Commande;
 use App\Form\CommandeType;
 use App\Repository\CommandeRepository;
+use App\Service\ConfirmationCommande;
 use App\Service\Paiement;
 use App\Service\Panier;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,6 +30,7 @@ class CommandeController extends AbstractController
         private readonly Paiement $paiement,
         private readonly EntityManagerInterface $em,
         private readonly LoggerInterface $logger,
+        private readonly ConfirmationCommande $confirmation,
     ) {
     }
 
@@ -101,8 +103,7 @@ class CommandeController extends AbstractController
         }
 
         if (!$this->paiement->isStripeActif()) {
-            $commande->marquerPayee('simulation');
-            $this->em->flush();
+            $this->confirmation->confirmerPaiement($commande, 'simulation');
 
             return $this->redirectToRoute('app_commande_confirmation', ['reference' => $reference]);
         }
@@ -137,8 +138,7 @@ class CommandeController extends AbstractController
         if (!$commande->isPayee() && $sessionId !== '' && $sessionId === $commande->getPaiementId() && $this->paiement->isStripeActif()) {
             try {
                 if ($this->paiement->sessionEstPayee($sessionId, $commande)) {
-                    $commande->marquerPayee('stripe', $sessionId);
-                    $this->em->flush();
+                    $this->confirmation->confirmerPaiement($commande, 'stripe', $sessionId);
                 }
             } catch (\Throwable $e) {
                 $this->logger->error('Vérification du paiement Stripe impossible', ['exception' => $e, 'commande' => $reference]);
@@ -184,8 +184,7 @@ class CommandeController extends AbstractController
             && ($session['payment_status'] ?? null) === 'paid') {
             $commande = $commandes->findOneBy(['reference' => (string) ($session['client_reference_id'] ?? '')]);
             if ($commande !== null && (int) ($session['amount_total'] ?? 0) === $commande->getTotal() * 100) {
-                $commande->marquerPayee('stripe', (string) ($session['id'] ?? ''));
-                $this->em->flush();
+                $this->confirmation->confirmerPaiement($commande, 'stripe', (string) ($session['id'] ?? ''));
             }
         }
 

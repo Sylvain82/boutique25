@@ -129,11 +129,11 @@ class Commande
         return in_array($this->statut, [self::PAYEE, self::EXPEDIEE], true);
     }
 
-    /** Enregistre le paiement (sans effet si la commande est déjà payée). */
-    public function marquerPayee(string $mode, ?string $paiementId = null): void
+    /** Enregistre le paiement. Renvoie false si la commande était déjà payée (rien n'est changé). */
+    public function marquerPayee(string $mode, ?string $paiementId = null): bool
     {
         if ($this->isPayee()) {
-            return;
+            return false;
         }
         $this->statut = self::PAYEE;
         $this->payeeLe = new \DateTimeImmutable();
@@ -141,6 +141,8 @@ class Commande
         if ($paiementId !== null) {
             $this->paiementId = $paiementId;
         }
+
+        return true;
     }
 
     public function getCreeLe(): \DateTimeImmutable

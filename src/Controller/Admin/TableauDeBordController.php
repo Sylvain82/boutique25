@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Repository\CommandeRepository;
 use App\Repository\ProduitRepository;
+use App\Service\ConfirmationCommande;
 use App\Service\Paiement;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +15,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class TableauDeBordController extends AbstractController
 {
     #[Route('/admin', name: 'app_admin')]
-    public function index(CommandeRepository $commandes, ProduitRepository $produits, Paiement $paiement): Response
+    public function index(CommandeRepository $commandes, ProduitRepository $produits, Paiement $paiement, ConfirmationCommande $confirmation): Response
     {
         return $this->render('admin/tableau_de_bord.html.twig', [
             'nbProduits' => $produits->count([]),
@@ -24,6 +25,7 @@ class TableauDeBordController extends AbstractController
             'stripe' => $paiement->isStripeActif(),
             'stripeTest' => $paiement->isModeTest(),
             'webhook' => $paiement->isWebhookConfigure(),
+            'emails' => $confirmation->isEnvoiActif(),
         ]);
     }
 }

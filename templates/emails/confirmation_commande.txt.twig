@@ -1,0 +1,18 @@
+Merci {{ commande.nom }} !
+
+Votre commande {{ commande.reference }} est confirmée (payée le {{ commande.payeeLe|date('d/m/Y à H:i', 'Europe/Paris') }}).
+
+{% for ligne in commande.lignes %}
+- {{ ligne.quantite }} × {{ ligne.nomProduit }} : {{ ligne.sousTotal|number_format(0, ',', ' ') }} €
+{% endfor %}
+
+Total : {{ commande.total|number_format(0, ',', ' ') }} €
+
+Livraison :
+{{ commande.nom }}
+{{ commande.adresse }}
+{{ commande.codePostal }} {{ commande.ville }}
+{% if commande.modePaiement == 'simulation' %}
+
+Paiement simulé : boutique de démonstration, aucun montant n'a été prélevé.
+{% endif %}

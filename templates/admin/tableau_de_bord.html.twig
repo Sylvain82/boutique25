@@ -48,6 +48,19 @@
         </div>
     </div>
 
+    <div class="card mb-4">
+        <div class="card-header">Emails</div>
+        <div class="card-body small">
+            {% if emails %}
+                <span class="badge text-bg-success">Actifs</span>
+                Un email de confirmation part vers le client à chaque commande payée.
+            {% else %}
+                <span class="badge text-bg-secondary">Désactivés</span>
+                Aucun email n'est envoyé. Pour les activer, ajoutez <code>MAILER_DSN</code> et <code>MAILER_FROM</code> dans Render (voir DEPLOIEMENT.md).
+            {% endif %}
+        </div>
+    </div>
+
     <h2 class="h5">Dernières commandes</h2>
     {% if dernieres %}
         {% include 'admin/commande/_liste.html.twig' with {commandes: dernieres} %}
