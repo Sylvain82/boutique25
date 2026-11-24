@@ -99,6 +99,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->creeLe;
     }
 
+    /** Rien à effacer : aucun mot de passe en clair n'est gardé dans l'objet. */
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
     }

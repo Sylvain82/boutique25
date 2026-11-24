@@ -23,7 +23,7 @@ class ProduitRepository extends ServiceEntityRepository
      */
     public function search(?string $q = null, ?string $type = null, bool $promotionOnly = false): array
     {
-        $qb = $this->createQueryBuilder('p')->orderBy('p.nom', 'ASC');
+        $qb = $this->createQueryBuilder('p')->orderBy('p.nom', \SortDirection::Ascending);
 
         $q = $q !== null ? trim($q) : '';
         if ($q !== '') {
@@ -48,7 +48,7 @@ class ProduitRepository extends ServiceEntityRepository
     {
         $rows = $this->createQueryBuilder('p')
             ->select('DISTINCT p.type AS type')
-            ->orderBy('p.type', 'ASC')
+            ->orderBy('p.type', \SortDirection::Ascending)
             ->getQuery()
             ->getSingleColumnResult();
 

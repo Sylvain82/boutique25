@@ -19,7 +19,7 @@ class CommandeRepository extends ServiceEntityRepository
     /** @return Commande[] les plus récentes d'abord, éventuellement filtrées par statut */
     public function findDernieres(?string $statut = null, int $limite = 200): array
     {
-        $qb = $this->createQueryBuilder('c')->orderBy('c.creeLe', 'DESC')->setMaxResults($limite);
+        $qb = $this->createQueryBuilder('c')->orderBy('c.creeLe', \SortDirection::Descending)->setMaxResults($limite);
         if ($statut !== null && $statut !== '') {
             $qb->andWhere('c.statut = :statut')->setParameter('statut', $statut);
         }
