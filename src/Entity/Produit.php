@@ -40,6 +40,10 @@ class Produit
     #[ORM\Column]
     private ?bool $promotion = false;
 
+    /** Date de la dernière photo envoyée (vide = pas de photo). Sert aussi à rafraîchir le cache du navigateur. */
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $imageMaj = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -103,5 +107,22 @@ class Produit
         $this->promotion = $promotion;
 
         return $this;
+    }
+
+    public function getImageMaj(): ?\DateTimeImmutable
+    {
+        return $this->imageMaj;
+    }
+
+    public function setImageMaj(?\DateTimeImmutable $imageMaj): static
+    {
+        $this->imageMaj = $imageMaj;
+
+        return $this;
+    }
+
+    public function hasImage(): bool
+    {
+        return $this->imageMaj !== null;
     }
 }

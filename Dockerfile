@@ -1,13 +1,17 @@
-# Image de production pour la boutique (Symfony 7.1, PHP 8.3 + Apache, base PostgreSQL).
+# Image de production pour la boutique (Symfony 7.4, PHP 8.3 + Apache, base PostgreSQL).
 # Utilisable sur Render, Koyeb, Fly.io, un VPS, etc.
 FROM php:8.3-apache
 
-# Extensions PHP nécessaires (intl, accès PostgreSQL) + modules Apache
+# Extensions PHP nécessaires (intl, accès PostgreSQL, gd + exif pour les photos) + modules Apache
 RUN apt-get update \
- && apt-get install -y --no-install-recommends git unzip libicu-dev libpq-dev \
- && docker-php-ext-install intl opcache pdo_pgsql \
+ && apt-get install -y --no-install-recommends git unzip libicu-dev libpq-dev libjpeg62-turbo-dev libpng-dev libwebp-dev \
+ && docker-php-ext-configure gd --with-jpeg --with-webp \
+ && docker-php-ext-install intl opcache pdo_pgsql gd exif \
  && a2enmod rewrite headers \
  && rm -rf /var/lib/apt/lists/*
+
+# Envoi de photos jusqu'à 8 Mo (réduites ensuite à 800 px) ; mémoire suffisante pour les traiter
+RUN printf 'upload_max_filesize=8M\npost_max_size=10M\nmemory_limit=256M\n' > /usr/local/etc/php/conf.d/boutique.ini
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -29,7 +33,11 @@ WORKDIR /var/www/html
 
 # 1) Dépendances (couche mise en cache tant que composer.json/lock ne changent pas)
 COPY composer.json composer.lock symfony.lock ./
-RUN composer install --no-dev --no-scripts --no-progress --prefer-dist --no-interaction
+# Réessaie jusqu'à 4 fois en cas de panne réseau passagère pendant le téléchargement
+RUN for essai in 1 2 3 4; do \
+      composer install --no-dev --no-scripts --no-progress --prefer-dist --no-interaction && exit 0; \
+      echo "Échec du téléchargement (essai $essai), nouvel essai dans 10 s…" >&2; sleep 10; \
+    done; exit 1
 
 # 2) Code de l'application
 COPY . .

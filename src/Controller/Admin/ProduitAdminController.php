@@ -5,6 +5,8 @@ namespace App\Controller\Admin;
 use App\Entity\Produit;
 use App\Form\ProduitType;
 use App\Repository\ProduitRepository;
+use App\Service\ImageProduit;
+use Symfony\Component\Form\FormInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,8 +19,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/admin/produits')]
 class ProduitAdminController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly ImageProduit $images,
+    ) {
     }
 
     #[Route('', name: 'app_admin_produits', methods: ['GET'])]
@@ -41,6 +45,7 @@ class ProduitAdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->em->persist($produit);
+            $this->traiterImage($produit, $form);
             $this->em->flush();
             $this->addFlash('success', sprintf('Produit « %s » ajouté.', $produit->getNom()));
 
@@ -61,6 +66,7 @@ class ProduitAdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->traiterImage($produit, $form);
             $this->em->flush();
             $this->addFlash('success', sprintf('Produit « %s » modifié.', $produit->getNom()));
 
@@ -72,6 +78,16 @@ class ProduitAdminController extends AbstractController
             'produit' => $produit,
             'types' => $produits->findTypes(),
         ]);
+    }
+
+    private function traiterImage(Produit $produit, FormInterface $form): void
+    {
+        $fichier = $form->get('image')->getData();
+        if ($fichier !== null) {
+            $this->images->enregistrer($produit, $fichier);
+        } elseif ($form->has('supprimerImage') && $form->get('supprimerImage')->getData()) {
+            $this->images->supprimer($produit);
+        }
     }
 
     #[Route('/{id}/supprimer', name: 'app_admin_produit_supprimer', methods: ['POST'], requirements: ['id' => '\d+'])]

@@ -9,6 +9,12 @@
     <div class="row">
         <div class="col-12 col-md-8 col-lg-6">
             {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+                {% if produit.hasImage %}
+                    <div class="mb-3">
+                        <div class="form-label">Photo actuelle</div>
+                        <img class="img-thumbnail admin-apercu" src="{{ path('app_produit_image', {id: produit.id, v: produit.imageMaj|date('U')}) }}" alt="Photo de {{ produit.nom }}">
+                    </div>
+                {% endif %}
                 {{ form_widget(form) }}
                 <datalist id="types-existants">
                     {% for t in types %}<option value="{{ t }}">{% endfor %}

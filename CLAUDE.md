@@ -4,7 +4,7 @@ Petit site de boutique perso de Sylvain (technicien méthodes, pas développeur 
 
 ## Stack
 
-- Symfony 7.1, PHP 8.3 (>= 8.2), Twig, Bootstrap 5.3 chargé par CDN dans `templates/base.html.twig`.
+- Symfony 7.4 (LTS), PHP 8.3 (>= 8.2), Twig, Bootstrap 5.3 chargé par CDN dans `templates/base.html.twig`.
 - Doctrine ORM 3 / DBAL 3 sur **PostgreSQL 16** (base hébergée chez **Neon**). Pas de MySQL : l'ancienne migration MySQL a été supprimée.
 - Pas de Stimulus / Turbo / importmap (retirés). Le CSS propre au site est dans `assets/styles/app.css`, servi par AssetMapper (`asset('styles/app.css')`, compilé au build avec `asset-map:compile`).
 - Hébergement : **Render** (offre gratuite, service Docker, région Frankfurt). Déploiement via `render.yaml` (Blueprint).
@@ -22,13 +22,15 @@ Petit site de boutique perso de Sylvain (technicien méthodes, pas développeur 
 - `/health` : page de santé pour Render (ne touche pas la base).
 - Entités : `Produit` (id, type, nom, marque, prix entier en euros, promotion), `Utilisateur`, `Commande`, `LigneCommande` (produit mis à NULL si le produit est supprimé). Toutes avec séquence explicite.
 - Commande `php bin/console app:produits:seed` : ajoute 14 produits de démo seulement si la table est vide.
-- Il n'y a **pas** encore : comptes clients, emails de confirmation, gestion des stocks, images de produits.
+- Email de confirmation : service `App\Service\ConfirmationCommande::confirmerPaiement()`, seul point d'entrée pour passer une commande en « payée » (paiement simulé, retour Stripe, webhook). `Commande::marquerPayee()` renvoie false si déjà payée, donc pas de double email. Gabarits `templates/emails/confirmation_commande.{html,txt}.twig`. Variables `MAILER_DSN` (`null://null` = désactivé, Brevo : `brevo+api://CLE@default` via `symfony/brevo-mailer`), `MAILER_FROM`, `MAILER_COPIE` (copie cachée). Envoi **synchrone** : le routage messenger de `SendEmailMessage` vers `async` a été retiré (pas de worker sur Render). Une erreur d'envoi est journalisée et ne bloque pas la commande.
+- Photos des produits : entité `ProduitImage` (table séparée, BYTEA, OneToOne unidirectionnelle vers `Produit`, cascade à la suppression). `Produit::imageMaj` (date, vide = pas de photo) évite de charger les images dans les listes. Service `App\Service\ImageProduit` (GD : redressement EXIF, 800 px max, WebP qualité 80). Servies par `/produits/{id}/image?v=<timestamp>` (cache navigateur 1 an, immutable). Envoi dans le formulaire admin (`ProduitType`, champ non mappé `image` + case `supprimerImage`). Dockerfile : extensions `gd` (jpeg, webp) et `exif`, `upload_max_filesize=8M`.
+- Il n'y a **pas** encore : comptes clients, gestion des stocks, plusieurs photos par produit.
 
 ## Déploiement (résumé, détails dans `DEPLOIEMENT.md`)
 
 - `Dockerfile` : PHP 8.3 + Apache. Les URL sont routées vers `index.php` par `FallbackResource` dans la config Apache (ne pas dépendre de `public/.htaccess`).
 - `docker/start.sh` : au démarrage, lance `doctrine:migrations:migrate`, puis le seed si `SEED_DEMO=1`, puis Apache. L'échec du seed n'empêche pas le démarrage.
-- Variables d'environnement Render : `APP_ENV=prod`, `APP_SECRET` (généré), `DATABASE_URL` (chaîne Neon `postgresql://…?sslmode=require`, à coller dans Render), `SEED_DEMO`, `MESSENGER_TRANSPORT_DSN`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
+- Variables d'environnement Render : `APP_ENV=prod`, `APP_SECRET` (généré), `DATABASE_URL` (chaîne Neon `postgresql://…?sslmode=require`, à coller dans Render), `SEED_DEMO`, `MESSENGER_TRANSPORT_DSN`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, et à ajouter à la main pour les emails : `MAILER_DSN`, `MAILER_FROM`, `MAILER_COPIE`.
 - **Ne jamais** écrire de clé Stripe ni de mot de passe dans un fichier versionné.
 - **Ne jamais** écrire la chaîne de connexion Neon dans un fichier versionné ni la coller dans une conversation. En local, elle va dans `.env.local` (ignoré par Git).
 
@@ -38,8 +40,10 @@ Petit site de boutique perso de Sylvain (technicien méthodes, pas développeur 
 2. **Ancienne migration MySQL** laissée dans `migrations/` : elle fait échouer le démarrage sur PostgreSQL (`AUTO_INCREMENT`). Il ne doit rester que la migration PostgreSQL.
 3. **Cache Doctrine préparé au build** : au `cache:warmup` du Dockerfile, `DATABASE_URL` n'existe pas encore ; Doctrine lisait le `.env` (alors MySQL) et choisissait une génération d'identifiants incompatible avec PostgreSQL. Corrigé : `#[ORM\GeneratedValue(strategy: 'SEQUENCE')]` + `SequenceGenerator('produit_id_seq')` dans `Produit`, et `DATABASE_URL` factice PostgreSQL au warmup dans le Dockerfile. Toute nouvelle entité doit suivre la même règle (séquence explicite).
 4. **Téléchargement Composer échoué au build** (code 100) : panne réseau passagère ; le Dockerfile réessaie jusqu'à 4 fois.
-5. **`composer install` en root** : les plugins Composer (dont `symfony/runtime`) sont désactivés → « Symfony Runtime is missing ». Lancer avec `COMPOSER_ALLOW_SUPERUSER=1` (le Dockerfile le fait).
-6. **DNS** : sur les appareils de Sylvain, NextDNS peut bloquer `onrender.com` / `github.io` (« Adresse introuvable »). À vérifier avant de chercher un bug dans le site.
+5. **Recette `csrf.yaml` de Symfony 7.2+** : la mise à jour a ajouté des jetons CSRF « sans état » (`stateless_token_ids`). Fichier supprimé volontairement : on garde les jetons classiques en session, testés avec tous les formulaires.
+6. **Serveur PHP intégré et `APP_ENV`** : `APP_ENV=prod php -S …` ne transmet pas la variable à Symfony ; pour tester le mode production en local, mettre `APP_ENV=prod` / `APP_DEBUG=0` dans `.env.local`.
+7. **`composer install` en root** : les plugins Composer (dont `symfony/runtime`) sont désactivés → « Symfony Runtime is missing ». Lancer avec `COMPOSER_ALLOW_SUPERUSER=1` (le Dockerfile le fait).
+8. **DNS** : sur les appareils de Sylvain, NextDNS peut bloquer `onrender.com` / `github.io` (« Adresse introuvable »). À vérifier avant de chercher un bug dans le site.
 
 ## Limites de l'offre gratuite
 
@@ -60,9 +64,9 @@ Nouvelle table ou colonne : modifier l'entité puis `php bin/console doctrine:mi
 
 ## Prochaines étapes envisagées
 
-1. Email de confirmation de commande (symfony/mailer est installé, il faut un service d'envoi : `MAILER_DSN`).
-2. Images des produits (stockage externe, car le disque Render est éphémère).
-3. Monter de version Symfony : la 7.1 n'est plus maintenue (`composer audit` signale des failles corrigées dans les versions suivantes).
+1. Vérifier le premier déploiement après la mise à jour (build Docker avec gd/exif non testé hors Render).
+2. Gestion des stocks, page de détail d'un produit.
+3. Symfony 8 (demande PHP 8.4) quand ce sera utile : la 7.4 est maintenue jusqu'à fin 2028 (correctifs de sécurité jusqu'à fin 2029).
 
 ## Conventions
 

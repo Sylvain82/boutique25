@@ -1,6 +1,6 @@
 # Déployer la boutique sur Render (gratuit)
 
-Le site (Symfony 7.1 + PHP 8.3) tourne dans un conteneur Docker, comme StatFoot.
+Le site (Symfony 7.4 + PHP 8.3) tourne dans un conteneur Docker, comme StatFoot.
 Il utilise **PostgreSQL**. Render ne propose pas MySQL.
 
 ## 1. Créer la base PostgreSQL
@@ -46,7 +46,7 @@ En local : `php bin/console app:admin:creer moi@exemple.fr` (le mot de passe est
 Adresse : `/admin` (réservée aux administrateurs connectés).
 
 - **Tableau de bord** : chiffre d'affaires, commandes à expédier, état du paiement.
-- **Produits** : ajouter, modifier, supprimer. Supprimer un produit ne touche pas les commandes déjà passées : elles gardent le nom et le prix.
+- **Produits** : ajouter, modifier, supprimer, avec une **photo** (JPEG, PNG ou WebP, 8 Mo maximum). La photo est réduite à 800 px et enregistrée dans la base Neon (environ 5 à 60 Ko par photo), car le disque de Render est effacé à chaque redémarrage. Supprimer un produit ne touche pas les commandes déjà passées : elles gardent le nom et le prix.
 - **Commandes** : liste filtrable par statut, détail (client, adresse, produits), changement de statut (payée → expédiée, annulée…).
 - **Administrateurs** : ajouter / supprimer un compte, changer son mot de passe. On ne peut pas supprimer son propre compte.
 
@@ -73,6 +73,21 @@ Parcours client : Panier > Commander > coordonnées > paiement > confirmation.
 Le tableau de bord de l'administration indique si Stripe et le webhook sont actifs.
 
 **Passer en paiements réels** : il faut activer le compte Stripe (identité, IBAN…) et remplacer la clé par la clé `sk_live_…` (et le webhook par celui du mode réel). Pour un vrai commerce, il faut aussi des mentions légales et des CGV.
+
+## Emails de confirmation de commande
+
+Quand une commande est payée, le client reçoit un email récapitulatif. Une copie cachée peut aussi t'être envoyée. **Sans configuration, aucun email ne part** : la variable `MAILER_DSN` vaut `null://null`. Le tableau de bord de l'administration indique si les emails sont actifs.
+
+Je conseille **Brevo** (service français). Il passe par une API web (HTTPS) plutôt que par le protocole d'envoi classique (SMTP), que les hébergeurs gratuits bloquent souvent. Vérifie leurs conditions actuelles : l'offre gratuite était limitée à 300 emails par jour.
+
+1. Crée un compte sur brevo.com.
+2. **Valide une adresse d'expédition** : Brevo > Expéditeurs, domaines > ajouter ton adresse, puis clique sur le lien de vérification reçu.
+3. Crée une **clé API** : Brevo > SMTP & API > Clés API > Générer une clé (elle commence par `xkeysib-`).
+4. Dans Render > Environment, ajoute :
+   - `MAILER_DSN` = `brevo+api://LA_CLE@default` (remplace `LA_CLE` par ta clé, sans espace). **Ne mets jamais cette clé dans un fichier du projet ni dans une conversation.**
+   - `MAILER_FROM` = l'adresse validée à l'étape 2
+   - `MAILER_COPIE` = ton adresse, si tu veux recevoir une copie de chaque commande (facultatif)
+5. Passe une commande de test : l'email doit arriver en quelques secondes. Sinon, regarde les journaux (« Logs ») de Render : chaque échec y apparaît sous la forme « Email de confirmation non envoyé ». Un email qui ne part pas n'empêche jamais la commande d'être validée.
 
 ## Limites de l'offre gratuite Render
 
