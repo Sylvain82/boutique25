@@ -14,6 +14,8 @@ class HomeController extends AbstractController
     {
         return $this->render('home/index.html.twig', [
             'promotions' => array_slice($produits->search(null, null, true), 0, 4),
+            'vitrine' => $produits->findAvecImage(3),
+            'types' => $produits->findTypes(),
         ]);
     }
 

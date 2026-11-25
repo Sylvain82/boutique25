@@ -54,4 +54,20 @@ class ProduitRepository extends ServiceEntityRepository
 
         return array_values($rows);
     }
+
+    /**
+     * Quelques produits qui ont une photo (vitrine de l'accueil), les promotions d'abord.
+     *
+     * @return Produit[]
+     */
+    public function findAvecImage(int $limite): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.imageMaj IS NOT NULL')
+            ->orderBy('p.promotion', \SortDirection::Descending)
+            ->addOrderBy('p.prix', \SortDirection::Descending)
+            ->setMaxResults($limite)
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -4,12 +4,12 @@
 
 {% block content %}
     {% include 'commande/_etapes.html.twig' with {etape: 3} %}
-    <h1 class="h3 mb-1">Paiement</h1>
+    <h1 class="page-titre">Paiement</h1>
     <p class="text-body-secondary">Commande n° <strong>{{ commande.reference }}</strong></p>
 
     <div class="row g-4">
         <div class="col-12 col-lg-7">
-            {% include 'commande/_recapitulatif.html.twig' %}
+            <div class="surface">{% include 'commande/_recapitulatif.html.twig' %}</div>
         </div>
         <div class="col-12 col-lg-5">
             <div class="card mb-3">
@@ -36,7 +36,7 @@
 
             <form method="post" action="{{ path('app_commande_payer', {reference: commande.reference}) }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('payer' ~ commande.reference) }}">
-                <button class="btn btn-success btn-lg w-100" type="submit">
+                <button class="btn btn-degrade btn-lg w-100" type="submit">
                     {{ stripe ? 'Payer par carte' : 'Simuler le paiement' }} — {{ commande.total|number_format(0, ',', ' ') }}&nbsp;€
                 </button>
             </form>

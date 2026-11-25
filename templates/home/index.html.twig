@@ -3,15 +3,61 @@
 {% block title %}Boutique — Accueil{% endblock %}
 
 {% block content %}
-    <div class="bg-body-tertiary p-5 rounded mb-5">
-        <h1>Bienvenue dans la boutique</h1>
-        <p class="lead">Retrouvez notre sélection de produits et profitez des promotions du moment.</p>
-        <a class="btn btn-lg btn-primary" href="{{ path('app_produits') }}" role="button">Voir tous les produits &raquo;</a>
+    <section class="hero mb-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="hero-etiquette">✨ Nouvelle collection high-tech</span>
+                <h1>Le bon matériel,<br><span class="texte-degrade">au bon prix.</span></h1>
+                <p class="lead mb-4">Casques, claviers, écrans et accessoires sélectionnés pour votre bureau, avec un paiement sécurisé.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-lg btn-degrade btn-icone" href="{{ path('app_produits') }}">
+                        Découvrir les produits {% include '_partials/icone.html.twig' with {nom: 'fleche'} %}
+                    </a>
+                    <a class="btn btn-lg btn-light" href="{{ path('app_produits', {promo: 1}) }}">Voir les promos</a>
+                </div>
+            </div>
+            {% if vitrine|length >= 2 %}
+                <div class="col-lg-6 d-none d-md-block">
+                    <div class="hero-vitrine" style="min-height: 24rem">
+                        {% for produit in vitrine %}
+                            <img src="{{ path('app_produit_image', {id: produit.id, v: produit.imageMaj|date('U')}) }}" alt="{{ produit.nom }}">
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <div class="atouts">
+        <div class="atout">
+            <span class="atout-icone">{% include '_partials/icone.html.twig' with {nom: 'etincelle'} %}</span>
+            <div><strong>Sélection high-tech</strong><span>Audio, claviers, écrans, accessoires</span></div>
+        </div>
+        <div class="atout">
+            <span class="atout-icone">{% include '_partials/icone.html.twig' with {nom: 'cadenas'} %}</span>
+            <div><strong>Paiement sécurisé</strong><span>Carte bancaire via Stripe</span></div>
+        </div>
+        <div class="atout">
+            <span class="atout-icone">{% include '_partials/icone.html.twig' with {nom: 'mail'} %}</span>
+            <div><strong>Confirmation par email</strong><span>Récapitulatif dès le paiement</span></div>
+        </div>
     </div>
 
-    <h2 class="h4 mb-3">Promotions</h2>
+    {% if types %}
+        <div class="section-titre"><h2>Catégories</h2></div>
+        <div class="puces">
+            {% for t in types %}
+                <a class="puce" href="{{ path('app_produits', {type: t}) }}">{{ t }}</a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="section-titre">
+        <h2>Promotions du moment</h2>
+        <a class="fw-semibold text-decoration-none btn-icone" href="{{ path('app_produits', {promo: 1}) }}">Tout voir {% include '_partials/icone.html.twig' with {nom: 'fleche'} %}</a>
+    </div>
     {% if promotions %}
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
             {% for produit in promotions %}
                 {% include '_partials/produit_card.html.twig' %}
             {% endfor %}

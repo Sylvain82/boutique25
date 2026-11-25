@@ -3,39 +3,45 @@
 {% block title %}Boutique — Produits{% endblock %}
 
 {% block content %}
-    <h1 class="h3 mb-4">Produits</h1>
+    <h1 class="page-titre">{{ promo ? 'Promotions' : (type ?: 'Tous les produits') }}</h1>
+    <p class="page-sous-titre">{{ produits|length }} produit{{ produits|length > 1 ? 's' }}{{ q ? ' pour « ' ~ q ~ ' »' }}</p>
 
-    <form class="row g-2 mb-4" method="get" action="{{ path('app_produits') }}">
-        <div class="col-12 col-md-5">
-            <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Nom ou marque" aria-label="Nom ou marque">
-        </div>
-        <div class="col-6 col-md-3">
-            <select class="form-select" name="type" aria-label="Type de produit">
-                <option value="">Tous les types</option>
-                {% for t in types %}
-                    <option value="{{ t }}"{{ t == type ? ' selected' }}>{{ t }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-6 col-md-2 d-flex align-items-center">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="promo" value="1" id="promo"{{ promo ? ' checked' }}>
-                <label class="form-check-label" for="promo">Promos</label>
+    <div class="puces mb-3">
+        <a class="puce{{ type == '' ? ' active' }}" href="{{ path('app_produits', {q: q ?: null, promo: promo ? 1 : null}) }}">Tout</a>
+        {% for t in types %}
+            <a class="puce{{ t == type ? ' active' }}" href="{{ path('app_produits', {type: t, q: q ?: null, promo: promo ? 1 : null}) }}">{{ t }}</a>
+        {% endfor %}
+    </div>
+
+    <form class="filtres row g-2 align-items-center" method="get" action="{{ path('app_produits') }}">
+        <input type="hidden" name="type" value="{{ type }}">
+        <div class="col-12 col-md">
+            <div class="recherche">
+                {% include '_partials/icone.html.twig' with {nom: 'recherche'} %}
+                <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Nom ou marque" aria-label="Nom ou marque">
             </div>
         </div>
-        <div class="col-12 col-md-2 d-grid">
+        <div class="col-auto">
+            <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" role="switch" name="promo" value="1" id="promo"{{ promo ? ' checked' }}>
+                <label class="form-check-label fw-semibold" for="promo">Promos uniquement</label>
+            </div>
+        </div>
+        <div class="col-auto">
             <button class="btn btn-primary" type="submit">Filtrer</button>
         </div>
     </form>
 
     {% if produits %}
-        <p class="text-body-secondary">{{ produits|length }} produit{{ produits|length > 1 ? 's' }}</p>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
             {% for produit in produits %}
                 {% include '_partials/produit_card.html.twig' %}
             {% endfor %}
         </div>
     {% else %}
-        <div class="alert alert-light border">Aucun produit ne correspond à votre recherche.</div>
+        <div class="surface text-center py-5">
+            <p class="fs-5 fw-semibold mb-1">Aucun produit ne correspond à votre recherche.</p>
+            <a href="{{ path('app_produits') }}">Voir tous les produits</a>
+        </div>
     {% endif %}
 {% endblock %}

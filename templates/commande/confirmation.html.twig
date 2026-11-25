@@ -28,7 +28,7 @@
         </div>
     {% endif %}
 
-    {% include 'commande/_recapitulatif.html.twig' %}
+    <div class="surface mb-3">{% include 'commande/_recapitulatif.html.twig' %}</div>
 
     <p class="text-body-secondary small">
         Livraison : {{ commande.nom }}, {{ commande.adresse }}, {{ commande.codePostal }} {{ commande.ville }}
