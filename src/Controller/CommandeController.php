@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Commande;
+use App\Entity\Utilisateur;
 use App\Form\CommandeType;
 use App\Repository\CommandeRepository;
 use App\Service\ConfirmationCommande;
@@ -46,10 +47,24 @@ class CommandeController extends AbstractController
         }
 
         $commande = new Commande();
+        $client = $this->getUser();
+        if ($client instanceof Utilisateur) {
+            // Client connecté : coordonnées pré-remplies depuis son compte
+            $commande->setNom($client->getNom())->setEmail($client->getEmail())
+                ->setAdresse($client->getAdresse())->setCodePostal($client->getCodePostal())->setVille($client->getVille());
+        }
         $form = $this->createForm(CommandeType::class, $commande);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($client instanceof Utilisateur) {
+                $commande->setUtilisateur($client);
+                // Première commande : on garde l'adresse dans le compte pour la prochaine fois
+                if ($client->getAdresse() === null || $client->getAdresse() === '') {
+                    $client->setNom($client->getNom() ?: $commande->getNom())->setAdresse($commande->getAdresse())
+                        ->setCodePostal($commande->getCodePostal())->setVille($commande->getVille());
+                }
+            }
             foreach ($lignes as $ligne) {
                 $commande->ajouterProduit($ligne['produit'], $ligne['quantite']);
             }
@@ -235,9 +250,14 @@ class CommandeController extends AbstractController
 
     private function commandeDuVisiteur(Request $request, string $reference, CommandeRepository $commandes): Commande
     {
+        $commande = $commandes->findOneBy(['reference' => $reference]);
         $mesCommandes = $request->getSession()->get(self::CLE_SESSION, []);
-        $commande = in_array($reference, $mesCommandes, true) ? $commandes->findOneBy(['reference' => $reference]) : null;
-        if ($commande === null) {
+        // Accès : commande passée dans cette visite (session) ou rattachée au compte connecté
+        $autorise = $commande !== null && (
+            in_array($reference, $mesCommandes, true)
+            || ($commande->getUtilisateur() !== null && $commande->getUtilisateur() === $this->getUser())
+        );
+        if (!$autorise) {
             throw $this->createNotFoundException('Commande introuvable.');
         }
 

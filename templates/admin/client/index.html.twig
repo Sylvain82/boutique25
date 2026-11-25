@@ -1,0 +1,35 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% block admin %}
+    <h1 class="h3 mb-1">Clients</h1>
+    <p class="text-body-secondary">{{ clients|length }} compte{{ clients|length > 1 ? 's' }} client{{ clients|length > 1 ? 's' }}. Les commandes passées sans compte n'apparaissent pas ici.</p>
+
+    {% if clients %}
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Ville</th>
+                        <th scope="col" class="text-center">Commandes</th>
+                        <th scope="col">Inscrit le</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                        <tr>
+                            <td class="fw-semibold">{{ client.nom ?: '—' }}</td>
+                            <td><a href="mailto:{{ client.email }}">{{ client.email }}</a></td>
+                            <td>{{ client.ville ?: '—' }}</td>
+                            <td class="text-center">{{ nbCommandes[client.id] ?? 0 }}</td>
+                            <td class="text-nowrap">{{ client.creeLe|date('d/m/Y', 'Europe/Paris') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-light border mb-0">Aucun client inscrit pour le moment.</div>
+    {% endif %}
+{% endblock %}

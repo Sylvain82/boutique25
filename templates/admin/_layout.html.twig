@@ -9,6 +9,7 @@
             <li class="nav-item"><a class="nav-link{{ route == 'app_admin' ? ' active' }}" href="{{ path('app_admin') }}">Tableau de bord</a></li>
             <li class="nav-item"><a class="nav-link{{ route starts with 'app_admin_produit' ? ' active' }}" href="{{ path('app_admin_produits') }}">Produits</a></li>
             <li class="nav-item"><a class="nav-link{{ route starts with 'app_admin_commande' ? ' active' }}" href="{{ path('app_admin_commandes') }}">Commandes</a></li>
+            <li class="nav-item"><a class="nav-link{{ route == 'app_admin_clients' ? ' active' }}" href="{{ path('app_admin_clients') }}">Clients</a></li>
             <li class="nav-item"><a class="nav-link{{ route starts with 'app_admin_administrateur' or route == 'app_admin_mot_de_passe' ? ' active' }}" href="{{ path('app_admin_administrateurs') }}">Administrateurs</a></li>
         </ul>
         <span class="small text-body-secondary">Connecté : {{ app.user.userIdentifier }}</span>

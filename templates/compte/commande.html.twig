@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boutique — Commande {{ commande.reference }}{% endblock %}
+
+{% block content %}
+    {% include 'compte/_menu.html.twig' %}
+
+    <a class="small" href="{{ path('app_compte') }}">&larr; Toutes mes commandes</a>
+    <div class="d-flex flex-wrap align-items-center gap-2 mt-2 mb-3">
+        <h2 class="h4 mb-0">Commande {{ commande.reference }}</h2>
+        {% include 'admin/_statut.html.twig' %}
+    </div>
+    <p class="text-body-secondary">
+        Passée le {{ commande.creeLe|date('d/m/Y à H:i', 'Europe/Paris') }}
+        {% if commande.payeeLe %}· payée le {{ commande.payeeLe|date('d/m/Y à H:i', 'Europe/Paris') }}{% endif %}
+    </p>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            <div class="surface">{% include 'commande/_recapitulatif.html.twig' %}</div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="surface">
+                <h3 class="h6">Livraison</h3>
+                <p class="mb-0">{{ commande.nom }}<br>{{ commande.adresse }}<br>{{ commande.codePostal }} {{ commande.ville }}</p>
+            </div>
+            {% if commande.statut == 'en_attente' %}
+                <a class="btn btn-degrade w-100 mt-3" href="{{ path('app_commande_paiement', {reference: commande.reference}) }}">Finaliser le paiement</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

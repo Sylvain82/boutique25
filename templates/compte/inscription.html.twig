@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block title %}Boutique — Créer un compte{% endblock %}
+
+{% block content %}
+    <div class="connexion-carte surface" style="max-width: 30rem">
+        <div class="text-center mb-4">
+            <span class="marque-logo mb-3" aria-hidden="true">B</span>
+            <h1 class="h3 mb-1">Créer un compte</h1>
+            <p class="text-body-secondary mb-0">Retrouvez l'historique de vos commandes et commandez plus vite.</p>
+        </div>
+
+        {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+            {{ form_widget(form) }}
+            <button class="btn btn-degrade btn-lg w-100 mt-2" type="submit">Créer mon compte</button>
+        {{ form_end(form) }}
+
+        <p class="text-center small text-body-secondary mt-4 mb-0">
+            Déjà un compte ?
+            <a href="{{ path('app_connexion', app.request.query.get('retour') == 'commande' ? {retour: 'commande'} : {}) }}">Se connecter</a>
+        </p>
+    </div>
+{% endblock %}

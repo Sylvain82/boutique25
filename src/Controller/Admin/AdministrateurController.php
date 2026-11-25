@@ -28,7 +28,7 @@ class AdministrateurController extends AbstractController
     public function index(UtilisateurRepository $utilisateurs): Response
     {
         return $this->render('admin/utilisateur/index.html.twig', [
-            'administrateurs' => $utilisateurs->findBy([], ['email' => 'ASC']),
+            'administrateurs' => $utilisateurs->findAdministrateurs(),
         ]);
     }
 
@@ -41,7 +41,7 @@ class AdministrateurController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $email = mb_strtolower(trim((string) $form->get('email')->getData()));
             if ($utilisateurs->findOneBy(['email' => $email]) !== null) {
-                $this->addFlash('danger', 'Un administrateur existe déjà avec cet email.');
+                $this->addFlash('danger', 'Un compte (administrateur ou client) existe déjà avec cet email.');
             } else {
                 $admin = (new Utilisateur())->setEmail($email)->setRoles(['ROLE_ADMIN']);
                 $admin->setPassword($this->hasher->hashPassword($admin, (string) $form->get('motDePasse')->getData()));
@@ -84,6 +84,9 @@ class AdministrateurController extends AbstractController
     #[Route('/{id}/supprimer', name: 'app_admin_administrateur_supprimer', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function supprimer(Utilisateur $admin, Request $request): Response
     {
+        if (!$admin->isAdmin()) {
+            throw $this->createNotFoundException(); // cette page ne supprime que des administrateurs
+        }
         if (!$this->isCsrfTokenValid('supprimer-admin' . $admin->getId(), (string) $request->request->get('_token'))) {
             return $this->redirectToRoute('app_admin_administrateurs');
         }

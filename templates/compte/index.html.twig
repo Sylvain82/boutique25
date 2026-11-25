@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boutique — Mon compte{% endblock %}
+
+{% block content %}
+    {% include 'compte/_menu.html.twig' %}
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            <div class="surface">
+                <h2 class="h5 mb-3">Mes commandes</h2>
+                {% if commandes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Référence</th>
+                                    <th scope="col" class="text-center">Articles</th>
+                                    <th scope="col" class="text-end">Total</th>
+                                    <th scope="col">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for commande in commandes %}
+                                    <tr>
+                                        <td class="text-nowrap">{{ commande.creeLe|date('d/m/Y', 'Europe/Paris') }}</td>
+                                        <td><a class="fw-semibold" href="{{ path('app_compte_commande', {reference: commande.reference}) }}">{{ commande.reference }}</a></td>
+                                        <td class="text-center">{{ commande.lignes|reduce((somme, l) => somme + l.quantite, 0) }}</td>
+                                        <td class="text-end text-nowrap fw-semibold">{{ commande.total|number_format(0, ',', ' ') }}&nbsp;€</td>
+                                        <td>{% include 'admin/_statut.html.twig' %}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="fw-semibold mb-1">Vous n'avez pas encore passé de commande avec ce compte.</p>
+                        <a class="btn btn-primary mt-2" href="{{ path('app_produits') }}">Découvrir les produits</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="surface mb-4">
+                <h2 class="h5 mb-3">Adresse de livraison</h2>
+                {% if app.user.adresse %}
+                    <p class="mb-3">{{ app.user.nom }}<br>{{ app.user.adresse }}<br>{{ app.user.codePostal }} {{ app.user.ville }}</p>
+                {% else %}
+                    <p class="text-body-secondary mb-3">Aucune adresse enregistrée. Elle sera gardée lors de votre première commande.</p>
+                {% endif %}
+                <a class="btn btn-outline-primary btn-sm" href="{{ path('app_compte_profil') }}">Modifier</a>
+            </div>
+            <div class="surface">
+                <h2 class="h5 mb-2">Supprimer mon compte</h2>
+                <p class="small text-body-secondary">Vos informations personnelles sont effacées. Les commandes déjà passées sont conservées par la boutique mais ne sont plus liées à un compte.</p>
+                <form method="post" action="{{ path('app_compte_supprimer') }}" onsubmit="return confirm('Supprimer définitivement votre compte ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('supprimer-compte') }}">
+                    <button class="btn btn-outline-danger btn-sm" type="submit">Supprimer mon compte</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

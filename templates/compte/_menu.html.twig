@@ -1,0 +1,12 @@
+{% set route = app.request.attributes.get('_route') %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h1 class="page-titre">Bonjour {{ app.user.nomAffiche }}</h1>
+        <div class="text-body-secondary">{{ app.user.email }}</div>
+    </div>
+    <ul class="nav nav-pills">
+        <li class="nav-item"><a class="nav-link{{ route in ['app_compte', 'app_compte_commande'] ? ' active' }}" href="{{ path('app_compte') }}">Mes commandes</a></li>
+        <li class="nav-item"><a class="nav-link{{ route == 'app_compte_profil' ? ' active' }}" href="{{ path('app_compte_profil') }}">Mes informations</a></li>
+        <li class="nav-item"><a class="nav-link{{ route == 'app_compte_mot_de_passe' ? ' active' }}" href="{{ path('app_compte_mot_de_passe') }}">Mot de passe</a></li>
+    </ul>
+</div>

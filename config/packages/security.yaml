@@ -21,7 +21,8 @@ security:
                 login_path: app_connexion
                 check_path: app_connexion
                 enable_csrf: true
-                default_target_path: app_admin
+                # Après connexion : page demandée avant, sinon admin → /admin, client → /mon-compte
+                default_target_path: app_apres_connexion
             logout:
                 path: app_deconnexion
                 target: app_home
@@ -29,9 +30,10 @@ security:
             login_throttling:
                 max_attempts: 5
 
-    # Seuls les administrateurs accèdent à /admin.
+    # /admin : administrateurs seulement. /mon-compte : toute personne connectée.
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/mon-compte, roles: ROLE_USER }
 
 when@test:
     security:

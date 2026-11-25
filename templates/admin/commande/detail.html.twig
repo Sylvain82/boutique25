@@ -24,6 +24,9 @@
                     {{ commande.adresse }}<br>
                     {{ commande.codePostal }} {{ commande.ville }}<br>
                     <a href="mailto:{{ commande.email }}">{{ commande.email }}</a>
+                    <div class="small text-body-secondary mt-2">
+                        {{ commande.utilisateur ? 'Client avec compte (' ~ commande.utilisateur.email ~ ')' : 'Commande sans compte client' }}
+                    </div>
                 </div>
             </div>
 

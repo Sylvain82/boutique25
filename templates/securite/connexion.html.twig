@@ -7,7 +7,7 @@
         <div class="text-center mb-4">
             <span class="marque-logo mb-3" aria-hidden="true">B</span>
             <h1 class="h3 mb-1">Connexion</h1>
-            <p class="text-body-secondary mb-0">Espace réservé aux administrateurs de la boutique.</p>
+            <p class="text-body-secondary mb-0">Accédez à vos commandes et à votre compte.</p>
         </div>
 
         {% if erreur %}
@@ -26,9 +26,14 @@
                 <input class="form-control" type="password" id="password" name="_password" autocomplete="current-password" required>
             </div>
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            {% if cible %}<input type="hidden" name="_target_path" value="{{ cible }}">{% endif %}
             <button class="btn btn-degrade btn-lg w-100" type="submit">Se connecter</button>
         </form>
 
+        <div class="text-center mt-4">
+            <p class="text-body-secondary mb-2">Pas encore de compte ?</p>
+            <a class="btn btn-outline-primary w-100" href="{{ path('app_inscription', retour ? {retour: retour} : {}) }}">Créer un compte</a>
+        </div>
         <p class="text-center small text-body-secondary mt-4 mb-0">
             <a href="{{ path('app_home') }}">&larr; Retour à la boutique</a>
         </p>

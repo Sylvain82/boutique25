@@ -37,7 +37,13 @@
                         {% include '_partials/icone.html.twig' with {nom: 'sortie'} %}
                     </a>
                 {% elseif app.user %}
-                    <a class="btn btn-link text-secondary" href="{{ path('app_deconnexion') }}">Se déconnecter</a>
+                    <a class="btn btn-primary btn-icone{{ route starts with 'app_compte' ? ' active' }}" href="{{ path('app_compte') }}">
+                        {% include '_partials/icone.html.twig' with {nom: 'utilisateur'} %}
+                        <span class="d-none d-sm-inline">Mon compte</span>
+                    </a>
+                    <a class="btn btn-link text-secondary px-2" href="{{ path('app_deconnexion') }}" title="Se déconnecter" aria-label="Se déconnecter">
+                        {% include '_partials/icone.html.twig' with {nom: 'sortie'} %}
+                    </a>
                 {% else %}
                     <a class="btn btn-primary btn-icone{{ route == 'app_connexion' ? ' active' }}" href="{{ path('app_connexion') }}">
                         {% include '_partials/icone.html.twig' with {nom: 'utilisateur'} %}
@@ -86,9 +92,11 @@
             <a href="{{ path('app_produits') }}">Produits</a>
             <a href="{{ path('app_panier') }}">Panier</a>
             {% if app.user %}
+                <a href="{{ path('app_compte') }}">Mon compte</a>
                 <a href="{{ path('app_deconnexion') }}">Se déconnecter</a>
             {% else %}
-                <a href="{{ path('app_connexion') }}">Espace administrateur</a>
+                <a href="{{ path('app_connexion') }}">Connexion</a>
+                <a href="{{ path('app_inscription') }}">Créer un compte</a>
             {% endif %}
         </nav>
     </div>

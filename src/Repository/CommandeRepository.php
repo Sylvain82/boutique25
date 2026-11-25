@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Commande;
+use App\Entity\Utilisateur;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -53,5 +54,28 @@ class CommandeRepository extends ServiceEntityRepository
         }
 
         return $resultat;
+    }
+
+    /** @return Commande[] commandes d'un client, les plus récentes d'abord */
+    public function findPourUtilisateur(Utilisateur $utilisateur): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.utilisateur = :u')->setParameter('u', $utilisateur)
+            ->orderBy('c.creeLe', \SortDirection::Descending)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @return array<int, int> nombre de commandes par identifiant de client */
+    public function compterParUtilisateur(): array
+    {
+        $rows = $this->createQueryBuilder('c')
+            ->select('IDENTITY(c.utilisateur) AS id, COUNT(c.id) AS n')
+            ->andWhere('c.utilisateur IS NOT NULL')
+            ->groupBy('c.utilisateur')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_column(array_map(fn ($r) => ['id' => (int) $r['id'], 'n' => (int) $r['n']], $rows), 'n', 'id');
     }
 }

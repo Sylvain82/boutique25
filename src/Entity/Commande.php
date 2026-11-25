@@ -83,6 +83,11 @@ class Commande
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $paiementId = null;
 
+    /** Compte du client, si la commande a été passée en étant connecté (vide sinon ou si le compte est supprimé). */
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Utilisateur $utilisateur = null;
+
     /** @var Collection<int, LigneCommande> */
     #[ORM\OneToMany(targetEntity: LigneCommande::class, mappedBy: 'commande', cascade: ['persist'], orphanRemoval: true)]
     private Collection $lignes;
@@ -233,6 +238,18 @@ class Commande
     public function setPaiementId(?string $paiementId): static
     {
         $this->paiementId = $paiementId;
+
+        return $this;
+    }
+
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?Utilisateur $utilisateur): static
+    {
+        $this->utilisateur = $utilisateur;
 
         return $this;
     }

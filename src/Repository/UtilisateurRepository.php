@@ -28,4 +28,21 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
         $user->setPassword($newHashedPassword);
         $this->getEntityManager()->flush();
     }
+
+    /** @return Utilisateur[] administrateurs, triés par email */
+    public function findAdministrateurs(): array
+    {
+        return array_values(array_filter($this->findBy([], ['email' => 'ASC']), fn (Utilisateur $u) => $u->isAdmin()));
+    }
+
+    /**
+     * Clients (comptes sans rôle administrateur), les plus récents d'abord.
+     * Le filtre est fait en PHP : la colonne « roles » est du JSON, peu pratique à filtrer en DQL.
+     *
+     * @return Utilisateur[]
+     */
+    public function findClients(): array
+    {
+        return array_values(array_filter($this->findBy([], ['creeLe' => 'DESC']), fn (Utilisateur $u) => !$u->isAdmin()));
+    }
 }

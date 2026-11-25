@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block title %}Boutique — {{ titre }}{% endblock %}
+
+{% block content %}
+    {% include 'compte/_menu.html.twig' %}
+
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="surface">
+                <h2 class="h5 mb-3">{{ titre }}</h2>
+                {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+                    {{ form_widget(form) }}
+                    <button class="btn btn-primary" type="submit">Enregistrer</button>
+                    <a class="btn btn-link" href="{{ path('app_compte') }}">Annuler</a>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -10,8 +10,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Compte qui peut se connecter à l'administration.
+ * Compte du site : client (rôle ROLE_USER) ou administrateur (ROLE_ADMIN en plus).
  * Le mot de passe n'est jamais stocké en clair : seulement son empreinte (hash).
+ * Nom et adresse servent à pré-remplir les commandes du client.
  */
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'Un compte existe déjà avec cet email.')]
@@ -37,6 +38,22 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?\DateTimeImmutable $creeLe = null;
+
+    #[ORM\Column(length: 120, nullable: true)]
+    #[Assert\Length(max: 120)]
+    private ?string $nom = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
+    private ?string $adresse = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    #[Assert\Regex(pattern: '/^\d{5}$/', message: 'Le code postal doit faire 5 chiffres.')]
+    private ?string $codePostal = null;
+
+    #[ORM\Column(length: 120, nullable: true)]
+    #[Assert\Length(max: 120)]
+    private ?string $ville = null;
 
     public function __construct()
     {
@@ -97,6 +114,65 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function getCreeLe(): ?\DateTimeImmutable
     {
         return $this->creeLe;
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array('ROLE_ADMIN', $this->roles, true);
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(?string $nom): static
+    {
+        $this->nom = $nom !== null ? trim($nom) : null;
+
+        return $this;
+    }
+
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(?string $adresse): static
+    {
+        $this->adresse = $adresse;
+
+        return $this;
+    }
+
+    public function getCodePostal(): ?string
+    {
+        return $this->codePostal;
+    }
+
+    public function setCodePostal(?string $codePostal): static
+    {
+        $this->codePostal = $codePostal;
+
+        return $this;
+    }
+
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(?string $ville): static
+    {
+        $this->ville = $ville;
+
+        return $this;
+    }
+
+    /** Nom affiché : le nom s'il est renseigné, sinon l'email. */
+    public function getNomAffiche(): string
+    {
+        return $this->nom ?: (string) $this->email;
     }
 
     /** Rien à effacer : aucun mot de passe en clair n'est gardé dans l'objet. */
