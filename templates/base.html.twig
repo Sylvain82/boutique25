@@ -3,7 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#6c5cff">
     <title>{% block title %}Boutique{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234f7cff'/%3E%3Cstop offset='.5' stop-color='%236c5cff'/%3E%3Cstop offset='1' stop-color='%23ff6fb1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='700' font-size='17' fill='white' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     {% block stylesheets %}
@@ -11,41 +13,58 @@
     {% endblock %}
 </head>
 <body>
-<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-    <div class="container">
-        <a class="navbar-brand" href="{{ path('app_home') }}">Boutique</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Afficher le menu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-            {% set route = app.request.attributes.get('_route') %}
-            <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                <li class="nav-item">
-                    <a class="nav-link{{ route == 'app_home' ? ' active' }}" href="{{ path('app_home') }}">Accueil</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link{{ route == 'app_produits' ? ' active' }}" href="{{ path('app_produits') }}">Produits</a>
-                </li>
-                {% if is_granted('ROLE_ADMIN') %}
-                    <li class="nav-item">
-                        <a class="nav-link{{ route starts with 'app_admin' ? ' active' }}" href="{{ path('app_admin') }}">Administration</a>
-                    </li>
-                {% endif %}
-            </ul>
-            {% set nbPanier = panier_nombre() %}
-            <a class="btn btn-outline-light me-md-3 mb-2 mb-md-0{{ route starts with 'app_panier' ? ' active' }}" href="{{ path('app_panier') }}">
-                Panier
-                {% if nbPanier > 0 %}<span class="badge text-bg-warning ms-1">{{ nbPanier }}</span>{% endif %}
+{% set route = app.request.attributes.get('_route') %}
+<header class="entete">
+    <nav class="navbar navbar-expand-lg" aria-label="Menu principal">
+        <div class="container">
+            <a class="marque me-lg-4" href="{{ path('app_home') }}">
+                <span class="marque-logo" aria-hidden="true">B</span>Boutique
             </a>
-            <form class="d-flex" role="search" action="{{ path('app_produits') }}" method="get">
-                <input class="form-control me-2" type="search" name="q" placeholder="Rechercher un produit" aria-label="Rechercher">
-                <button class="btn btn-outline-success" type="submit">Rechercher</button>
-            </form>
-        </div>
-    </div>
-</nav>
 
-<main class="container">
+            <div class="d-flex align-items-center gap-2 order-lg-last ms-auto ms-lg-3">
+                {% set nbPanier = panier_nombre() %}
+                <a class="btn btn-outline-primary btn-icone btn-panier{{ route starts with 'app_panier' ? ' active' }}" href="{{ path('app_panier') }}" aria-label="Panier{{ nbPanier > 0 ? ', ' ~ nbPanier ~ ' article' ~ (nbPanier > 1 ? 's') }}">
+                    {% include '_partials/icone.html.twig' with {nom: 'panier'} %}
+                    <span class="d-none d-sm-inline">Panier</span>
+                    {% if nbPanier > 0 %}<span class="pastille">{{ nbPanier }}</span>{% endif %}
+                </a>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a class="btn btn-primary btn-icone" href="{{ path('app_admin') }}">
+                        {% include '_partials/icone.html.twig' with {nom: 'tableau'} %}
+                        <span class="d-none d-sm-inline">Administration</span>
+                    </a>
+                    <a class="btn btn-link text-secondary px-2" href="{{ path('app_deconnexion') }}" title="Se déconnecter" aria-label="Se déconnecter">
+                        {% include '_partials/icone.html.twig' with {nom: 'sortie'} %}
+                    </a>
+                {% elseif app.user %}
+                    <a class="btn btn-link text-secondary" href="{{ path('app_deconnexion') }}">Se déconnecter</a>
+                {% else %}
+                    <a class="btn btn-primary btn-icone{{ route == 'app_connexion' ? ' active' }}" href="{{ path('app_connexion') }}">
+                        {% include '_partials/icone.html.twig' with {nom: 'utilisateur'} %}
+                        <span>Connexion</span>
+                    </a>
+                {% endif %}
+                <button class="navbar-toggler ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Afficher le menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse" id="menu">
+                <ul class="navbar-nav gap-lg-1 mt-3 mt-lg-0">
+                    <li class="nav-item"><a class="nav-link{{ route == 'app_home' ? ' active' }}" href="{{ path('app_home') }}">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link{{ route == 'app_produits' ? ' active' }}" href="{{ path('app_produits') }}">Produits</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_produits', {promo: 1}) }}">Promotions</a></li>
+                </ul>
+                <form class="recherche ms-lg-auto my-3 my-lg-0" role="search" action="{{ path('app_produits') }}" method="get">
+                    {% include '_partials/icone.html.twig' with {nom: 'recherche'} %}
+                    <input class="form-control" type="search" name="q" value="{{ app.request.query.get('q') }}" placeholder="Rechercher un produit" aria-label="Rechercher un produit">
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="container pt-4">
     {% for type, messages in app.flashes %}
         {% for message in messages %}
             <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
@@ -57,14 +76,22 @@
     {% block content %}{% endblock %}
 </main>
 
-<footer class="container text-center text-body-secondary small my-5">
-    Boutique — projet de démonstration
-    ·
-    {% if app.user %}
-        <a class="link-secondary" href="{{ path('app_deconnexion') }}">Se déconnecter</a>
-    {% else %}
-        <a class="link-secondary" href="{{ path('app_connexion') }}">Espace administrateur</a>
-    {% endif %}
+<footer class="pied">
+    <div class="container d-flex flex-column flex-md-row gap-3 justify-content-between align-items-md-center">
+        <div>
+            <a class="marque" href="{{ path('app_home') }}"><span class="marque-logo" aria-hidden="true">B</span>Boutique</a>
+            <div class="mt-2">Projet de démonstration — aucun produit n'est réellement expédié.</div>
+        </div>
+        <nav class="d-flex flex-wrap gap-3" aria-label="Liens du pied de page">
+            <a href="{{ path('app_produits') }}">Produits</a>
+            <a href="{{ path('app_panier') }}">Panier</a>
+            {% if app.user %}
+                <a href="{{ path('app_deconnexion') }}">Se déconnecter</a>
+            {% else %}
+                <a href="{{ path('app_connexion') }}">Espace administrateur</a>
+            {% endif %}
+        </nav>
+    </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
